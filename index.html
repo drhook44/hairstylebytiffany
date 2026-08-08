@@ -1,0 +1,1366 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Hair Style by Tiffany — Professional Braiding Salon, Topeka KS</title>
+  <meta name="description" content="Topeka's trusted hair braiding salon. Box braids, cornrows, goddess braids, twists & more. Book your appointment at Hair Style by Tiffany, 942 SE 28th St.">
+  <meta property="og:title" content="Hair Style by Tiffany — Professional Braiding Salon">
+  <meta property="og:description" content="Expert braiding services in Topeka, KS. Book online today.">
+  <meta property="og:type" content="website">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ctext y='26' font-size='26'%3E💇🏾%3C/text%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    html, body { font-family: 'Inter', ui-sans-serif, system-ui, sans-serif; }
+    body { -webkit-font-smoothing: antialiased; }
+    .reveal { opacity: 0; transform: translateY(24px); transition: opacity .7s ease-out, transform .7s ease-out; }
+    .reveal.in-view { opacity: 1; transform: none; }
+
+    /* Page transitions */
+    .page { display: none; animation: fadeIn .4s ease; }
+    .page.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+
+    /* Calendar & Booking */
+    .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px; background: #e5e7eb; border-radius: 0.75rem; overflow: hidden; }
+    .calendar-grid > div { background: white; padding: 0.75rem 0.5rem; text-align: center; font-size: 0.875rem; min-height: 60px; }
+    .calendar-grid .day-header { background: #451a03; color: white; font-weight: 600; font-size: 0.75rem; padding: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em; }
+    .calendar-grid .day-cell { cursor: pointer; transition: all .15s; }
+    .calendar-grid .day-cell:hover { background: #fef3c7; }
+    .calendar-grid .day-cell.selected { background: #d97706; color: white; font-weight: 600; }
+    .calendar-grid .day-cell.other-month { color: #d1d5db; }
+    .calendar-grid .day-cell.today { font-weight: 700; border: 2px solid #d97706; }
+    .time-slot { display: inline-block; padding: 0.5rem 1rem; margin: 0.25rem; border: 1px solid #e5e7eb; border-radius: 0.5rem; cursor: pointer; font-size: 0.875rem; transition: all .15s; }
+    .time-slot:hover { border-color: #d97706; background: #fffbeb; }
+    .time-slot.selected { background: #d97706; color: white; border-color: #d97706; }
+    .time-slot.booked { opacity: 0.4; cursor: not-allowed; text-decoration: line-through; }
+
+    /* Admin styles */
+    .admin-sidebar { background: #1c1917; min-height: 100vh; }
+    .admin-sidebar a { display: block; padding: 0.75rem 1.25rem; color: #a8a29e; transition: all .15s; border-left: 3px solid transparent; }
+    .admin-sidebar a:hover, .admin-sidebar a.active { color: white; background: #292524; border-left-color: #d97706; }
+
+    /* Mobile nav */
+    .mobile-menu { display: none; }
+    .mobile-menu.open { display: flex; }
+
+    @media (max-width: 768px) {
+      .calendar-grid > div { min-height: 48px; padding: 0.5rem 0.25rem; font-size: 0.75rem; }
+    }
+  </style>
+</head>
+<body class="antialiased bg-stone-50 text-zinc-900">
+
+  <!-- ===== NAVBAR ===== -->
+  <nav class="fixed top-0 left-0 right-0 z-50 bg-stone-50/95 backdrop-blur border-b border-stone-200">
+    <div class="max-w-6xl mx-auto px-6 flex items-center justify-between h-16">
+      <a href="#" onclick="showPage('home')" class="flex items-center gap-2">
+        <span class="text-xl font-bold text-stone-900">Hair Style by <span class="text-amber-700">Tiffany</span></span>
+      </a>
+      <div class="hidden md:flex items-center gap-8 text-sm font-medium text-stone-600">
+        <a href="#" onclick="showPage('services')" class="hover:text-amber-700 transition">Services</a>
+        <a href="#" onclick="showPage('about')" class="hover:text-amber-700 transition">About</a>
+        <a href="#" onclick="showPage('portfolio')" class="hover:text-amber-700 transition">Portfolio</a>
+        <a href="#" onclick="showPage('shop')" class="hover:text-amber-700 transition">Shop</a>
+        <a href="#" onclick="showPage('contact')" class="hover:text-amber-700 transition">Contact</a>
+        <a href="#" onclick="showPage('booking')" class="inline-flex items-center gap-1 rounded-lg bg-amber-700 px-4 py-2 text-sm font-medium text-white transition hover:bg-amber-800">Book Now →</a>
+      </div>
+      <button onclick="toggleMobileMenu()" class="md:hidden p-2 text-stone-600">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
+    </div>
+    <!-- Mobile menu -->
+    <div id="mobileMenu" class="mobile-menu flex-col bg-stone-50 border-b border-stone-200 px-6 pb-4 md:hidden">
+      <a href="#" onclick="showPage('services')" class="py-2 text-sm font-medium text-stone-600 hover:text-amber-700">Services</a>
+      <a href="#" onclick="showPage('about')" class="py-2 text-sm font-medium text-stone-600 hover:text-amber-700">About</a>
+      <a href="#" onclick="showPage('portfolio')" class="py-2 text-sm font-medium text-stone-600 hover:text-amber-700">Portfolio</a>
+      <a href="#" onclick="showPage('shop')" class="py-2 text-sm font-medium text-stone-600 hover:text-amber-700">Shop</a>
+      <a href="#" onclick="showPage('contact')" class="py-2 text-sm font-medium text-stone-600 hover:text-amber-700">Contact</a>
+      <a href="#" onclick="showPage('booking')" class="mt-2 inline-flex items-center justify-center gap-1 rounded-lg bg-amber-700 px-4 py-2 text-sm font-medium text-white">Book Now →</a>
+    </div>
+  </nav>
+
+  <!-- ===== PAGE CONTAINER ===== -->
+  <main class="pt-16">
+
+    <!-- ============================================================ -->
+    <!-- PAGE: HOME                                                    -->
+    <!-- ============================================================ -->
+    <div id="page-home" class="page active">
+
+      <!-- HERO -->
+      <section class="relative overflow-hidden bg-gradient-to-b from-stone-100 to-stone-50">
+        <div class="max-w-6xl mx-auto px-6 py-24 sm:py-32 lg:py-40">
+          <div class="grid lg:grid-cols-2 gap-12 items-center">
+            <div>
+              <p class="text-sm font-semibold uppercase tracking-widest text-amber-700 mb-4">Topeka's Premier Braiding Salon</p>
+              <h1 class="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.05] text-stone-900">
+                Hair Style by <span class="text-amber-700">Tiffany</span>
+              </h1>
+              <p class="mt-6 text-lg text-stone-600 leading-relaxed max-w-lg">
+                Expert braiding, twists, locs, and natural hair care — crafted with care in our Topeka studio. Every style tells a story.
+              </p>
+              <div class="mt-8 flex flex-wrap gap-4">
+                <a href="#" onclick="showPage('booking')" class="inline-flex items-center gap-2 rounded-lg bg-amber-700 px-6 py-3.5 text-sm font-medium text-white shadow-md transition hover:bg-amber-800">Book Your Appointment →</a>
+                <a href="#" onclick="showPage('services')" class="inline-flex items-center gap-2 rounded-lg border border-stone-200 bg-white px-6 py-3.5 text-sm font-medium text-stone-900 transition hover:bg-stone-50">View Services</a>
+              </div>
+              <div class="mt-8 flex items-center gap-6 text-sm text-stone-500">
+                <span class="flex items-center gap-1.5">📍 942 SE 28th St, Topeka KS</span>
+                <span class="flex items-center gap-1.5">📞 (785) 555-0123</span>
+              </div>
+            </div>
+            <div class="relative">
+              <img src="/workspace/media/tool-image-generation/image-1---851b0841-1747-49d3-9122-49b9a914c6a3.jpg" alt="Hair Style by Tiffany salon interior" class="rounded-2xl shadow-2xl w-full object-cover aspect-[4/3]">
+              <div class="absolute -bottom-4 -left-4 bg-white rounded-xl shadow-lg px-5 py-3 hidden sm:block">
+                <p class="text-sm font-semibold text-stone-900">⭐ 4.9 — 200+ Reviews</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- QUICK BOOKING SNIPPET -->
+      <section class="py-16 bg-stone-50">
+        <div class="max-w-6xl mx-auto px-6">
+          <div class="bg-white rounded-2xl border border-stone-200 shadow-sm p-8 sm:p-10">
+            <div class="grid md:grid-cols-4 gap-6 items-end">
+              <div>
+                <label class="block text-sm font-medium text-stone-700 mb-2">Service</label>
+                <select id="quickService" class="w-full rounded-lg border border-stone-300 px-4 py-2.5 text-sm bg-white">
+                  <option>Box Braids</option>
+                  <option>Cornrows</option>
+                  <option>Goddess Braids</option>
+                  <option>Senegalese Twists</option>
+                  <option>Locs Retwist</option>
+                  <option>Butterfly Locs</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-stone-700 mb-2">Date</label>
+                <input type="date" id="quickDate" class="w-full rounded-lg border border-stone-300 px-4 py-2.5 text-sm bg-white">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-stone-700 mb-2">Time</label>
+                <select id="quickTime" class="w-full rounded-lg border border-stone-300 px-4 py-2.5 text-sm bg-white">
+                  <option>9:00 AM</option>
+                  <option>10:00 AM</option>
+                  <option>11:00 AM</option>
+                  <option>12:00 PM</option>
+                  <option>1:00 PM</option>
+                  <option>2:00 PM</option>
+                  <option>3:00 PM</option>
+                  <option>4:00 PM</option>
+                </select>
+              </div>
+              <div>
+                <a href="#" onclick="showPage('booking')" class="inline-flex items-center justify-center gap-2 rounded-lg bg-amber-700 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-amber-800 w-full">Check Availability →</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- FEATURED SERVICES -->
+      <section class="py-20 sm:py-28">
+        <div class="max-w-6xl mx-auto px-6">
+          <div class="text-center mb-14">
+            <p class="text-sm font-semibold uppercase tracking-widest text-amber-700">Our Expertise</p>
+            <h2 class="text-3xl sm:text-4xl font-bold tracking-tight mt-3">Signature Braiding Services</h2>
+            <p class="mt-4 text-stone-600 max-w-xl mx-auto">From classic cornrows to luxury goddess braids — each style is customized to bring your vision to life.</p>
+          </div>
+          <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="rounded-2xl border border-stone-200 bg-white shadow-sm p-6 hover:shadow-lg transition">
+              <div class="w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center mb-4">
+                <svg class="w-6 h-6 text-amber-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+              </div>
+              <h3 class="font-semibold text-lg mb-1">Box Braids</h3>
+              <p class="text-sm text-stone-500 mb-3">Classic or jumbo. Starting at $160</p>
+              <p class="text-xs text-stone-400">2-4 hrs · Includes wash & blow-dry</p>
+            </div>
+            <div class="rounded-2xl border border-stone-200 bg-white shadow-sm p-6 hover:shadow-lg transition">
+              <div class="w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center mb-4">
+                <svg class="w-6 h-6 text-amber-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+              </div>
+              <h3 class="font-semibold text-lg mb-1">Cornrows</h3>
+              <p class="text-sm text-stone-500 mb-3">Straight-back or designs. Starting at $100</p>
+              <p class="text-xs text-stone-400">1-3 hrs · Includes scalp treatment</p>
+            </div>
+            <div class="rounded-2xl border border-stone-200 bg-white shadow-sm p-6 hover:shadow-lg transition">
+              <div class="w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center mb-4">
+                <svg class="w-6 h-6 text-amber-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+              </div>
+              <h3 class="font-semibold text-lg mb-1">Goddess Braids</h3>
+              <p class="text-sm text-stone-500 mb-3">With curly ends. Starting at $220</p>
+              <p class="text-xs text-stone-400">3-5 hrs · Premium Kanekalon hair</p>
+            </div>
+            <div class="rounded-2xl border border-stone-200 bg-white shadow-sm p-6 hover:shadow-lg transition">
+              <div class="w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center mb-4">
+                <svg class="w-6 h-6 text-amber-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+              </div>
+              <h3 class="font-semibold text-lg mb-1">Faux Locs</h3>
+              <p class="text-sm text-stone-500 mb-3">Butterfly & Bohemian. Starting at $250</p>
+              <p class="text-xs text-stone-400">4-6 hrs · Includes hair + styling</p>
+            </div>
+          </div>
+          <div class="text-center mt-10">
+            <a href="#" onclick="showPage('services')" class="text-sm font-medium text-amber-700 hover:text-amber-800 transition">View All Services & Pricing →</a>
+          </div>
+        </div>
+      </section>
+
+      <!-- TESTIMONIALS -->
+      <section class="py-20 sm:py-28 bg-stone-100">
+        <div class="max-w-6xl mx-auto px-6">
+          <div class="text-center mb-14">
+            <p class="text-sm font-semibold uppercase tracking-widest text-amber-700">Love Letters</p>
+            <h2 class="text-3xl sm:text-4xl font-bold tracking-tight mt-3">What Our Clients Say</h2>
+          </div>
+          <div class="grid md:grid-cols-3 gap-6">
+            <div class="rounded-2xl border border-stone-200 bg-white shadow-sm p-6">
+              <div class="flex gap-1 mb-3">⭐ ⭐ ⭐ ⭐ ⭐</div>
+              <p class="text-sm text-stone-600 leading-relaxed mb-4">"Tiffany is an artist. My box braids lasted 6 weeks and still looked fresh. Best salon in Topeka, hands down."</p>
+              <div class="text-sm"><span class="font-semibold">Mira C.</span> <span class="text-stone-400">· Client since 2023</span></div>
+            </div>
+            <div class="rounded-2xl border border-stone-200 bg-white shadow-sm p-6">
+              <div class="flex gap-1 mb-3">⭐ ⭐ ⭐ ⭐ ⭐</div>
+              <p class="text-sm text-stone-600 leading-relaxed mb-4">"I drive from KC just to get my cornrows done here. Worth every mile. The scalp massage alone is 10/10."</p>
+              <div class="text-sm"><span class="font-semibold">DeShawn W.</span> <span class="text-stone-400">· Client since 2024</span></div>
+            </div>
+            <div class="rounded-2xl border border-stone-200 bg-white shadow-sm p-6">
+              <div class="flex gap-1 mb-3">⭐ ⭐ ⭐ ⭐ ⭐</div>
+              <p class="text-sm text-stone-600 leading-relaxed mb-4">"My daughter's first braiding experience was incredible. Tiffany was so patient and gentle. She left feeling like a princess!"</p>
+              <div class="text-sm"><span class="font-semibold">Keisha T.</span> <span class="text-stone-400">· Client since 2022</span></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- CTA -->
+      <section class="py-20 sm:py-28">
+        <div class="max-w-6xl mx-auto px-6 text-center">
+          <h2 class="text-3xl sm:text-4xl font-bold tracking-tight">Ready to be styled?</h2>
+          <p class="mt-4 text-stone-600 max-w-md mx-auto">Book your appointment online in under 2 minutes. No deposit required.</p>
+          <a href="#" onclick="showPage('booking')" class="mt-8 inline-flex items-center gap-2 rounded-lg bg-amber-700 px-6 py-3.5 text-sm font-medium text-white shadow-md transition hover:bg-amber-800">Book Your Appointment →</a>
+        </div>
+      </section>
+
+      <!-- FOOTER -->
+      <footer class="bg-stone-900 text-stone-400 py-16">
+        <div class="max-w-6xl mx-auto px-6">
+          <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-10">
+            <div>
+              <h3 class="text-white font-semibold mb-4">Hair Style by Tiffany</h3>
+              <p class="text-sm leading-relaxed">Topeka's trusted braiding salon. Natural hair care, braids, twists, locs & more.</p>
+            </div>
+            <div>
+              <h3 class="text-white font-semibold mb-4">Quick Links</h3>
+              <ul class="space-y-2 text-sm">
+                <li><a href="#" onclick="showPage('services')" class="hover:text-white transition">Services</a></li>
+                <li><a href="#" onclick="showPage('about')" class="hover:text-white transition">About</a></li>
+                <li><a href="#" onclick="showPage('portfolio')" class="hover:text-white transition">Portfolio</a></li>
+                <li><a href="#" onclick="showPage('shop')" class="hover:text-white transition">Shop</a></li>
+                <li><a href="#" onclick="showPage('contact')" class="hover:text-white transition">Contact</a></li>
+              </ul>
+            </div>
+            <div>
+              <h3 class="text-white font-semibold mb-4">Hours</h3>
+              <ul class="space-y-1 text-sm">
+                <li>Mon–Fri: 9am – 6pm</li>
+                <li>Sat: 9am – 4pm</li>
+                <li>Sun: Closed</li>
+              </ul>
+            </div>
+            <div>
+              <h3 class="text-white font-semibold mb-4">Contact</h3>
+              <ul class="space-y-2 text-sm">
+                <li>942 SE 28th St, Topeka KS</li>
+                <li>(785) 555-0123</li>
+                <li>hello@hairstylebytiffany.com</li>
+              </ul>
+            </div>
+          </div>
+          <div class="border-t border-stone-700 mt-10 pt-8 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs">
+            <p>&copy; 2025 Hair Style by Tiffany. All rights reserved.</p>
+            <div class="flex gap-4">
+              <a href="#" class="hover:text-white transition">Instagram</a>
+              <a href="#" class="hover:text-white transition">Facebook</a>
+              <a href="#" class="hover:text-white transition">Pinterest</a>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- PAGE: SERVICES                                                -->
+    <!-- ============================================================ -->
+    <div id="page-services" class="page">
+      <section class="py-20 sm:py-28">
+        <div class="max-w-6xl mx-auto px-6">
+          <div class="text-center mb-14">
+            <p class="text-sm font-semibold uppercase tracking-widest text-amber-700">Our Menu</p>
+            <h1 class="text-4xl sm:text-5xl font-bold tracking-tight mt-3">Services & Pricing</h1>
+            <p class="mt-4 text-stone-600 max-w-xl mx-auto">All services include a consultation, wash, and blow-dry. Prices may vary based on length and thickness.</p>
+          </div>
+
+          <div class="grid lg:grid-cols-2 gap-8">
+            <!-- Braids -->
+            <div class="rounded-2xl border border-stone-200 bg-white shadow-sm overflow-hidden">
+              <div class="bg-amber-700 px-6 py-3">
+                <h2 class="text-white font-semibold text-lg">Braids</h2>
+              </div>
+              <div class="divide-y divide-stone-100">
+                <div class="flex justify-between items-center px-6 py-4"><span class="font-medium">Box Braids (Small)</span><span class="text-amber-700 font-semibold">$220+</span></div>
+                <div class="flex justify-between items-center px-6 py-4"><span class="font-medium">Box Braids (Medium)</span><span class="text-amber-700 font-semibold">$180+</span></div>
+                <div class="flex justify-between items-center px-6 py-4"><span class="font-medium">Box Braids (Jumbo)</span><span class="text-amber-700 font-semibold">$160+</span></div>
+                <div class="flex justify-between items-center px-6 py-4"><span class="font-medium">Goddess Braids</span><span class="text-amber-700 font-semibold">$220+</span></div>
+                <div class="flex justify-between items-center px-6 py-4"><span class="font-medium">Feed-in Braids</span><span class="text-amber-700 font-semibold">$150+</span></div>
+                <div class="flex justify-between items-center px-6 py-4"><span class="font-medium">Triangle Box Braids</span><span class="text-amber-700 font-semibold">$200+</span></div>
+              </div>
+            </div>
+
+            <!-- Cornrows & Twists -->
+            <div class="rounded-2xl border border-stone-200 bg-white shadow-sm overflow-hidden">
+              <div class="bg-amber-700 px-6 py-3">
+                <h2 class="text-white font-semibold text-lg">Cornrows & Twists</h2>
+              </div>
+              <div class="divide-y divide-stone-100">
+                <div class="flex justify-between items-center px-6 py-4"><span class="font-medium">Straight-back Cornrows</span><span class="text-amber-700 font-semibold">$100+</span></div>
+                <div class="flex justify-between items-center px-6 py-4"><span class="font-medium">Design Cornrows</span><span class="text-amber-700 font-semibold">$130+</span></div>
+                <div class="flex justify-between items-center px-6 py-4"><span class="font-medium">Senegalese Twists</span><span class="text-amber-700 font-semibold">$190+</span></div>
+                <div class="flex justify-between items-center px-6 py-4"><span class="font-medium">Kinky Twists</span><span class="text-amber-700 font-semibold">$180+</span></div>
+                <div class="flex justify-between items-center px-6 py-4"><span class="font-medium">Passion Twists</span><span class="text-amber-700 font-semibold">$210+</span></div>
+                <div class="flex justify-between items-center px-6 py-4"><span class="font-medium">Butterfly Locs</span><span class="text-amber-700 font-semibold">$250+</span></div>
+              </div>
+            </div>
+
+            <!-- Locs & Natural Hair -->
+            <div class="rounded-2xl border border-stone-200 bg-white shadow-sm overflow-hidden">
+              <div class="bg-amber-700 px-6 py-3">
+                <h2 class="text-white font-semibold text-lg">Locs & Natural Hair Care</h2>
+              </div>
+              <div class="divide-y divide-stone-100">
+                <div class="flex justify-between items-center px-6 py-4"><span class="font-medium">Loc Retwist</span><span class="text-amber-700 font-semibold">$80+</span></div>
+                <div class="flex justify-between items-center px-6 py-4"><span class="font-medium">Loc Maintenance</span><span class="text-amber-700 font-semibold">$100+</span></div>
+                <div class="flex justify-between items-center px-6 py-4"><span class="font-medium">Loc Styling</span><span class="text-amber-700 font-semibold">$120+</span></div>
+                <div class="flex justify-between items-center px-6 py-4"><span class="font-medium">Silk Press</span><span class="text-amber-700 font-semibold">$70+</span></div>
+                <div class="flex justify-between items-center px-6 py-4"><span class="font-medium">Deep Conditioning Treatment</span><span class="text-amber-700 font-semibold">$45+</span></div>
+                <div class="flex justify-between items-center px-6 py-4"><span class="font-medium">Scalp Treatment</span><span class="text-amber-700 font-semibold">$35+</span></div>
+              </div>
+            </div>
+
+            <!-- Crochet & Sew-in -->
+            <div class="rounded-2xl border border-stone-200 bg-white shadow-sm overflow-hidden">
+              <div class="bg-amber-700 px-6 py-3">
+                <h2 class="text-white font-semibold text-lg">Extensions & Sew-in</h2>
+              </div>
+              <div class="divide-y divide-stone-100">
+                <div class="flex justify-between items-center px-6 py-4"><span class="font-medium">Crochet Braids</span><span class="text-amber-700 font-semibold">$140+</span></div>
+                <div class="flex justify-between items-center px-6 py-4"><span class="font-medium">Sew-in Weave</span><span class="text-amber-700 font-semibold">$180+</span></div>
+                <div class="flex justify-between items-center px-6 py-4"><span class="font-medium">Faux Locs (Bohemian)</span><span class="text-amber-700 font-semibold">$260+</span></div>
+                <div class="flex justify-between items-center px-6 py-4"><span class="font-medium">Faux Locs (Classic)</span><span class="text-amber-700 font-semibold">$250+</span></div>
+                <div class="flex justify-between items-center px-6 py-4"><span class="font-medium">Clip-in Extensions (set)</span><span class="text-amber-700 font-semibold">$90+</span></div>
+                <div class="flex justify-between items-center px-6 py-4"><span class="font-medium">Custom Wig Installation</span><span class="text-amber-700 font-semibold">$120+</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="text-center mt-12">
+            <p class="text-sm text-stone-500 mb-4">*Prices are starting ranges. Final quote given at consultation.</p>
+            <a href="#" onclick="showPage('booking')" class="inline-flex items-center gap-2 rounded-lg bg-amber-700 px-6 py-3.5 text-sm font-medium text-white shadow-md transition hover:bg-amber-800">Book Your Appointment →</a>
+          </div>
+        </div>
+      </section>
+
+      <!-- Footer -->
+      <footer class="bg-stone-900 text-stone-400 py-12">
+        <div class="max-w-6xl mx-auto px-6 text-center text-xs">
+          <p>&copy; 2025 Hair Style by Tiffany. All rights reserved.</p>
+        </div>
+      </footer>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- PAGE: ABOUT                                                  -->
+    <!-- ============================================================ -->
+    <div id="page-about" class="page">
+      <section class="py-20 sm:py-28">
+        <div class="max-w-6xl mx-auto px-6">
+          <div class="grid lg:grid-cols-2 gap-12 items-center mb-20">
+            <div>
+              <p class="text-sm font-semibold uppercase tracking-widest text-amber-700">Our Story</p>
+              <h1 class="text-4xl sm:text-5xl font-bold tracking-tight mt-3">Meet Tiffany</h1>
+              <p class="mt-6 text-stone-600 leading-relaxed">
+                Hair Style by Tiffany started as a dream in a small home studio. Over 8 years, it's grown into Topeka's go-to destination for protective styling and natural hair care.
+              </p>
+              <p class="mt-4 text-stone-600 leading-relaxed">
+                Founded by Tiffany, a licensed cosmetologist with a deep passion for braiding, our salon is built on three pillars: precision, education, and love for natural hair. Every client leaves feeling beautiful, confident, and understood.
+              </p>
+              <p class="mt-4 text-stone-600 leading-relaxed">
+                We specialize in protective styles that promote hair growth while keeping you stunning. From first-time braiders to seasoned loc wearers — everyone is welcome here.
+              </p>
+              <div class="mt-8 grid grid-cols-3 gap-6 text-center">
+                <div>
+                  <p class="text-3xl font-bold text-amber-700">8+</p>
+                  <p class="text-sm text-stone-500">Years Experience</p>
+                </div>
+                <div>
+                  <p class="text-3xl font-bold text-amber-700">2,400+</p>
+                  <p class="text-sm text-stone-500">Happy Clients</p>
+                </div>
+                <div>
+                  <p class="text-3xl font-bold text-amber-700">4.9⭐</p>
+                  <p class="text-sm text-stone-500">Avg. Rating</p>
+                </div>
+              </div>
+            </div>
+            <div>
+              <img src="/workspace/media/tool-image-generation/image-1---851b0841-1747-49d3-9122-49b9a914c6a3.jpg" alt="Hair Style by Tiffany salon" class="rounded-2xl shadow-xl w-full object-cover aspect-[4/5]">
+            </div>
+          </div>
+
+          <!-- Values -->
+          <div class="grid md:grid-cols-3 gap-8">
+            <div class="rounded-2xl border border-stone-200 bg-white shadow-sm p-8 text-center">
+              <div class="w-14 h-14 rounded-full bg-amber-100 flex items-center justify-center mx-auto mb-5">
+                <svg class="w-7 h-7 text-amber-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+              </div>
+              <h3 class="font-semibold text-lg mb-2">Healthy Hair First</h3>
+              <p class="text-sm text-stone-500">We never sacrifice hair health for style. Every service includes scalp care and hydration.</p>
+            </div>
+            <div class="rounded-2xl border border-stone-200 bg-white shadow-sm p-8 text-center">
+              <div class="w-14 h-14 rounded-full bg-amber-100 flex items-center justify-center mx-auto mb-5">
+                <svg class="w-7 h-7 text-amber-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+              </div>
+              <h3 class="font-semibold text-lg mb-2">Inclusive Space</h3>
+              <p class="text-sm text-stone-500">All hair textures, all ages, all genders. Our salon is a judgment-free zone of creativity.</p>
+            </div>
+            <div class="rounded-2xl border border-stone-200 bg-white shadow-sm p-8 text-center">
+              <div class="w-14 h-14 rounded-full bg-amber-100 flex items-center justify-center mx-auto mb-5">
+                <svg class="w-7 h-7 text-amber-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
+              </div>
+              <h3 class="font-semibold text-lg mb-2">Customized Service</h3>
+              <p class="text-sm text-stone-500">No two heads are alike. Every style is tailored to your hair type, lifestyle, and vision.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Footer -->
+      <footer class="bg-stone-900 text-stone-400 py-12">
+        <div class="max-w-6xl mx-auto px-6 text-center text-xs">
+          <p>&copy; 2025 Hair Style by Tiffany. All rights reserved.</p>
+        </div>
+      </footer>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- PAGE: PORTFOLIO                                               -->
+    <!-- ============================================================ -->
+    <div id="page-portfolio" class="page">
+      <section class="py-20 sm:py-28">
+        <div class="max-w-6xl mx-auto px-6">
+          <div class="text-center mb-14">
+            <p class="text-sm font-semibold uppercase tracking-widest text-amber-700">Our Work</p>
+            <h1 class="text-4xl sm:text-5xl font-bold tracking-tight mt-3">Portfolio</h1>
+            <p class="mt-4 text-stone-600 max-w-xl mx-auto">Browse some of our favorite styles. Every look is hand-crafted with precision and care.</p>
+          </div>
+
+          <!-- Filter buttons -->
+          <div class="flex flex-wrap justify-center gap-3 mb-10">
+            <button onclick="filterPortfolio('all')" class="filter-btn px-5 py-2 rounded-full text-sm font-medium border border-stone-200 bg-amber-700 text-white transition" data-filter="all">All</button>
+            <button onclick="filterPortfolio('braids')" class="filter-btn px-5 py-2 rounded-full text-sm font-medium border border-stone-200 bg-white text-stone-600 hover:bg-stone-50 transition" data-filter="braids">Braids</button>
+            <button onclick="filterPortfolio('cornrows')" class="filter-btn px-5 py-2 rounded-full text-sm font-medium border border-stone-200 bg-white text-stone-600 hover:bg-stone-50 transition" data-filter="cornrows">Cornrows</button>
+            <button onclick="filterPortfolio('twists')" class="filter-btn px-5 py-2 rounded-full text-sm font-medium border border-stone-200 bg-white text-stone-600 hover:bg-stone-50 transition" data-filter="twists">Twists</button>
+            <button onclick="filterPortfolio('locs')" class="filter-btn px-5 py-2 rounded-full text-sm font-medium border border-stone-200 bg-white text-stone-600 hover:bg-stone-50 transition" data-filter="locs">Locs</button>
+          </div>
+
+          <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6" id="portfolioGrid">
+            <div class="portfolio-item rounded-2xl border border-stone-200 bg-white shadow-sm overflow-hidden group" data-category="braids">
+              <img src="/workspace/media/tool-image-generation/image-1---07eed924-d13b-4b21-b3d8-c0564cacf053.jpg" alt="Box braids style" class="w-full aspect-square object-cover group-hover:scale-105 transition duration-500">
+              <div class="p-4"><h3 class="font-semibold">Box Braids</h3><p class="text-xs text-stone-400">Medium · Waist-length</p></div>
+            </div>
+            <div class="portfolio-item rounded-2xl border border-stone-200 bg-white shadow-sm overflow-hidden group" data-category="cornrows">
+              <img src="/workspace/media/tool-image-generation/image-1---2412124a-e33e-44de-b88a-795d686388f9.jpg" alt="Cornrows style" class="w-full aspect-square object-cover group-hover:scale-105 transition duration-500">
+              <div class="p-4"><h3 class="font-semibold">Straight-back Cornrows</h3><p class="text-xs text-stone-400">Design pattern</p></div>
+            </div>
+            <div class="portfolio-item rounded-2xl border border-stone-200 bg-white shadow-sm overflow-hidden group" data-category="braids">
+              <img src="/workspace/media/tool-image-generation/image-1---8a5191df-6659-423c-8090-9c939dcc30ac.jpg" alt="Goddess braids style" class="w-full aspect-square object-cover group-hover:scale-105 transition duration-500">
+              <div class="p-4"><h3 class="font-semibold">Goddess Braids</h3><p class="text-xs text-stone-400">With curly ends</p></div>
+            </div>
+            <div class="portfolio-item rounded-2xl border border-stone-200 bg-white shadow-sm overflow-hidden group" data-category="twists">
+              <img src="/workspace/media/tool-image-generation/image-1---07eed924-d13b-4b21-b3d8-c0564cacf053.jpg" alt="Senegalese twists" class="w-full aspect-square object-cover group-hover:scale-105 transition duration-500">
+              <div class="p-4"><h3 class="font-semibold">Senegalese Twists</h3><p class="text-xs text-stone-400">Long · Medium thickness</p></div>
+            </div>
+            <div class="portfolio-item rounded-2xl border border-stone-200 bg-white shadow-sm overflow-hidden group" data-category="locs">
+              <img src="/workspace/media/tool-image-generation/image-1---2412124a-e33e-44de-b88a-795d686388f9.jpg" alt="Loc style" class="w-full aspect-square object-cover group-hover:scale-105 transition duration-500">
+              <div class="p-4"><h3 class="font-semibold">Butterfly Locs</h3><p class="text-xs text-stone-400">Bohemian style</p></div>
+            </div>
+            <div class="portfolio-item rounded-2xl border border-stone-200 bg-white shadow-sm overflow-hidden group" data-category="braids">
+              <img src="/workspace/media/tool-image-generation/image-1---8a5191df-6659-423c-8090-9c939dcc30ac.jpg" alt="Faux locs" class="w-full aspect-square object-cover group-hover:scale-105 transition duration-500">
+              <div class="p-4"><h3 class="font-semibold">Faux Locs</h3><p class="text-xs text-stone-400">Classic long</p></div>
+            </div>
+          </div>
+
+          <div class="text-center mt-12">
+            <a href="#" onclick="showPage('booking')" class="inline-flex items-center gap-2 rounded-lg bg-amber-700 px-6 py-3.5 text-sm font-medium text-white shadow-md transition hover:bg-amber-800">Book Your Appointment →</a>
+          </div>
+        </div>
+      </section>
+
+      <!-- Footer -->
+      <footer class="bg-stone-900 text-stone-400 py-12">
+        <div class="max-w-6xl mx-auto px-6 text-center text-xs">
+          <p>&copy; 2025 Hair Style by Tiffany. All rights reserved.</p>
+        </div>
+      </footer>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- PAGE: SHOP                                                    -->
+    <!-- ============================================================ -->
+    <div id="page-shop" class="page">
+      <section class="py-20 sm:py-28">
+        <div class="max-w-6xl mx-auto px-6">
+          <div class="text-center mb-14">
+            <p class="text-sm font-semibold uppercase tracking-widest text-amber-700">Retail</p>
+            <h1 class="text-4xl sm:text-5xl font-bold tracking-tight mt-3">Shop Products</h1>
+            <p class="mt-4 text-stone-600 max-w-xl mx-auto">Curated hair care products we trust and use in the salon. Pick up during your visit or order online.</p>
+          </div>
+
+          <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="rounded-2xl border border-stone-200 bg-white shadow-sm overflow-hidden hover:shadow-lg transition group">
+              <img src="/workspace/media/tool-image-generation/image-1---b09ec4f9-4983-4d09-9fd6-473c894bcdd5.jpg" alt="Shampoo product" class="w-full aspect-square object-cover group-hover:scale-105 transition duration-500">
+              <div class="p-4">
+                <p class="text-xs text-amber-700 font-semibold uppercase tracking-wider">Shampoo</p>
+                <h3 class="font-semibold mt-1">Moisture Boost Shampoo</h3>
+                <p class="text-sm text-stone-500 mt-1">Sulfate-free · 12 oz</p>
+                <div class="flex items-center justify-between mt-3">
+                  <span class="font-bold text-amber-700">$18.00</span>
+                  <button class="text-xs font-medium text-amber-700 hover:text-amber-800" onclick="addToCart('Moisture Boost Shampoo', 18)">Add to Cart →</button>
+                </div>
+              </div>
+            </div>
+            <div class="rounded-2xl border border-stone-200 bg-white shadow-sm overflow-hidden hover:shadow-lg transition group">
+              <img src="/workspace/media/tool-image-generation/image-1---b09ec4f9-4983-4d09-9fd6-473c894bcdd5.jpg" alt="Leave-in conditioner" class="w-full aspect-square object-cover group-hover:scale-105 transition duration-500">
+              <div class="p-4">
+                <p class="text-xs text-amber-700 font-semibold uppercase tracking-wider">Conditioner</p>
+                <h3 class="font-semibold mt-1">Hydrating Leave-In Cream</h3>
+                <p class="text-sm text-stone-500 mt-1">With shea butter · 8 oz</p>
+                <div class="flex items-center justify-between mt-3">
+                  <span class="font-bold text-amber-700">$14.00</span>
+                  <button class="text-xs font-medium text-amber-700 hover:text-amber-800" onclick="addToCart('Hydrating Leave-In Cream', 14)">Add to Cart →</button>
+                </div>
+              </div>
+            </div>
+            <div class="rounded-2xl border border-stone-200 bg-white shadow-sm overflow-hidden hover:shadow-lg transition group">
+              <img src="/workspace/media/tool-image-generation/image-1---b09ec4f9-4983-4d09-9fd6-473c894bcdd5.jpg" alt="Hair oil" class="w-full aspect-square object-cover group-hover:scale-105 transition duration-500">
+              <div class="p-4">
+                <p class="text-xs text-amber-700 font-semibold uppercase tracking-wider">Oil</p>
+                <h3 class="font-semibold mt-1">Growth & Scalp Oil</h3>
+                <p class="text-sm text-stone-500 mt-1">Tea tree & peppermint · 4 oz</p>
+                <div class="flex items-center justify-between mt-3">
+                  <span class="font-bold text-amber-700">$12.00</span>
+                  <button class="text-xs font-medium text-amber-700 hover:text-amber-800" onclick="addToCart('Growth & Scalp Oil', 12)">Add to Cart →</button>
+                </div>
+              </div>
+            </div>
+            <div class="rounded-2xl border border-stone-200 bg-white shadow-sm overflow-hidden hover:shadow-lg transition group">
+              <img src="/workspace/media/tool-image-generation/image-1---b09ec4f9-4983-4d09-9fd6-473c894bcdd5.jpg" alt="Edge control" class="w-full aspect-square object-cover group-hover:scale-105 transition duration-500">
+              <div class="p-4">
+                <p class="text-xs text-amber-700 font-semibold uppercase tracking-wider">Styling</p>
+                <h3 class="font-semibold mt-1">Edge Control Gel</h3>
+                <p class="text-sm text-stone-500 mt-1">Extra hold · Alcohol-free</p>
+                <div class="flex items-center justify-between mt-3">
+                  <span class="font-bold text-amber-700">$9.00</span>
+                  <button class="text-xs font-medium text-amber-700 hover:text-amber-800" onclick="addToCart('Edge Control Gel', 9)">Add to Cart →</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Cart -->
+          <div class="mt-16 bg-white rounded-2xl border border-stone-200 shadow-sm p-6 sm:p-8">
+            <h3 class="font-semibold text-lg mb-4">🛒 Your Cart <span id="cartCount" class="text-sm text-stone-500 font-normal">(0 items)</span></h3>
+            <div id="cartItems" class="text-sm text-stone-500">Your cart is empty.</div>
+            <div class="mt-4 flex justify-between items-center">
+              <span class="font-semibold">Total: <span id="cartTotal">$0.00</span></span>
+              <button onclick="checkout()" class="rounded-lg bg-amber-700 px-5 py-2 text-sm font-medium text-white transition hover:bg-amber-800">Checkout →</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Footer -->
+      <footer class="bg-stone-900 text-stone-400 py-12">
+        <div class="max-w-6xl mx-auto px-6 text-center text-xs">
+          <p>&copy; 2025 Hair Style by Tiffany. All rights reserved.</p>
+        </div>
+      </footer>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- PAGE: CONTACT                                                 -->
+    <!-- ============================================================ -->
+    <div id="page-contact" class="page">
+      <section class="py-20 sm:py-28">
+        <div class="max-w-6xl mx-auto px-6">
+          <div class="grid lg:grid-cols-2 gap-12">
+            <div>
+              <p class="text-sm font-semibold uppercase tracking-widest text-amber-700">Get in Touch</p>
+              <h1 class="text-4xl sm:text-5xl font-bold tracking-tight mt-3">Contact Us</h1>
+              <p class="mt-4 text-stone-600">Have a question or want a custom quote? We'd love to hear from you.</p>
+
+              <div class="mt-10 space-y-6">
+                <div class="flex gap-4">
+                  <div class="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center shrink-0">
+                    <svg class="w-5 h-5 text-amber-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                  </div>
+                  <div>
+                    <h4 class="font-semibold text-sm">Address</h4>
+                    <p class="text-sm text-stone-500">942 SE 28th St, Topeka, KS 66605</p>
+                  </div>
+                </div>
+                <div class="flex gap-4">
+                  <div class="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center shrink-0">
+                    <svg class="w-5 h-5 text-amber-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
+                  </div>
+                  <div>
+                    <h4 class="font-semibold text-sm">Phone</h4>
+                    <p class="text-sm text-stone-500">(785) 555-0123</p>
+                  </div>
+                </div>
+                <div class="flex gap-4">
+                  <div class="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center shrink-0">
+                    <svg class="w-5 h-5 text-amber-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                  </div>
+                  <div>
+                    <h4 class="font-semibold text-sm">Email</h4>
+                    <p class="text-sm text-stone-500">hello@hairstylebytiffany.com</p>
+                  </div>
+                </div>
+                <div class="flex gap-4">
+                  <div class="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center shrink-0">
+                    <svg class="w-5 h-5 text-amber-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                  </div>
+                  <div>
+                    <h4 class="font-semibold text-sm">Hours</h4>
+                    <p class="text-sm text-stone-500">Mon–Fri 9am–6pm · Sat 9am–4pm · Sun Closed</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Contact form -->
+            <div class="rounded-2xl border border-stone-200 bg-white shadow-sm p-8">
+              <h3 class="font-semibold text-lg mb-6">Send a Message</h3>
+              <form onsubmit="submitContact(event)">
+                <div class="grid sm:grid-cols-2 gap-4 mb-4">
+                  <div>
+                    <label class="block text-sm font-medium text-stone-700 mb-1.5">Name</label>
+                    <input type="text" required class="w-full rounded-lg border border-stone-300 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent">
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-stone-700 mb-1.5">Email</label>
+                    <input type="email" required class="w-full rounded-lg border border-stone-300 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent">
+                  </div>
+                </div>
+                <div class="mb-4">
+                  <label class="block text-sm font-medium text-stone-700 mb-1.5">Phone</label>
+                  <input type="tel" class="w-full rounded-lg border border-stone-300 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent">
+                </div>
+                <div class="mb-4">
+                  <label class="block text-sm font-medium text-stone-700 mb-1.5">Service Interested In</label>
+                  <select class="w-full rounded-lg border border-stone-300 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent">
+                    <option>Box Braids</option>
+                    <option>Cornrows</option>
+                    <option>Goddess Braids</option>
+                    <option>Senegalese Twists</option>
+                    <option>Faux Locs</option>
+                    <option>Other</option>
+                  </select>
+                </div>
+                <div class="mb-6">
+                  <label class="block text-sm font-medium text-stone-700 mb-1.5">Message</label>
+                  <textarea rows="4" required class="w-full rounded-lg border border-stone-300 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"></textarea>
+                </div>
+                <button type="submit" class="w-full rounded-lg bg-amber-700 px-5 py-3 text-sm font-medium text-white shadow-sm transition hover:bg-amber-800">Send Message →</button>
+              </form>
+              <div id="contactSuccess" class="hidden mt-4 p-3 bg-green-50 border border-green-200 rounded-lg text-sm text-green-700 text-center">Thanks! We'll get back to you within 24 hours.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Footer -->
+      <footer class="bg-stone-900 text-stone-400 py-12">
+        <div class="max-w-6xl mx-auto px-6 text-center text-xs">
+          <p>&copy; 2025 Hair Style by Tiffany. All rights reserved.</p>
+        </div>
+      </footer>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- PAGE: BOOKING (Full Calendar + Booking System)                -->
+    <!-- ============================================================ -->
+    <div id="page-booking" class="page">
+      <section class="py-20 sm:py-28">
+        <div class="max-w-4xl mx-auto px-6">
+          <div class="text-center mb-12">
+            <p class="text-sm font-semibold uppercase tracking-widest text-amber-700">Book Online</p>
+            <h1 class="text-4xl sm:text-5xl font-bold tracking-tight mt-3">Schedule Your Appointment</h1>
+            <p class="mt-4 text-stone-600">Pick a service, date, and time. We'll confirm within 2 hours.</p>
+          </div>
+
+          <!-- Step indicator -->
+          <div class="flex justify-center gap-2 mb-10">
+            <span class="step-indicator w-3 h-3 rounded-full bg-amber-700" data-step="1"></span>
+            <span class="step-indicator w-3 h-3 rounded-full bg-stone-200" data-step="2"></span>
+            <span class="step-indicator w-3 h-3 rounded-full bg-stone-200" data-step="3"></span>
+          </div>
+
+          <!-- Step 1: Service Selection -->
+          <div id="bookingStep1" class="bg-white rounded-2xl border border-stone-200 shadow-sm p-8">
+            <h2 class="text-xl font-semibold mb-6">1. Choose a Service</h2>
+            <div class="grid sm:grid-cols-2 gap-3">
+              <label class="service-option block rounded-xl border border-stone-200 p-4 cursor-pointer hover:border-amber-500 transition has-[:checked]:border-amber-700 has-[:checked]:bg-amber-50">
+                <input type="radio" name="service" value="Box Braids" class="sr-only" onchange="updateBookingSummary()">
+                <h3 class="font-semibold text-sm">Box Braids</h3>
+                <p class="text-xs text-stone-500">Small / Medium / Jumbo · $160–$220</p>
+              </label>
+              <label class="service-option block rounded-xl border border-stone-200 p-4 cursor-pointer hover:border-amber-500 transition has-[:checked]:border-amber-700 has-[:checked]:bg-amber-50">
+                <input type="radio" name="service" value="Cornrows" class="sr-only" onchange="updateBookingSummary()">
+                <h3 class="font-semibold text-sm">Cornrows</h3>
+                <p class="text-xs text-stone-500">Straight-back / Design · $100–$130</p>
+              </label>
+              <label class="service-option block rounded-xl border border-stone-200 p-4 cursor-pointer hover:border-amber-500 transition has-[:checked]:border-amber-700 has-[:checked]:bg-amber-50">
+                <input type="radio" name="service" value="Goddess Braids" class="sr-only" onchange="updateBookingSummary()">
+                <h3 class="font-semibold text-sm">Goddess Braids</h3>
+                <p class="text-xs text-stone-500">With curly ends · $220+</p>
+              </label>
+              <label class="service-option block rounded-xl border border-stone-200 p-4 cursor-pointer hover:border-amber-500 transition has-[:checked]:border-amber-700 has-[:checked]:bg-amber-50">
+                <input type="radio" name="service" value="Senegalese Twists" class="sr-only" onchange="updateBookingSummary()">
+                <h3 class="font-semibold text-sm">Senegalese Twists</h3>
+                <p class="text-xs text-stone-500">Medium / Chunky · $190+</p>
+              </label>
+              <label class="service-option block rounded-xl border border-stone-200 p-4 cursor-pointer hover:border-amber-500 transition has-[:checked]:border-amber-700 has-[:checked]:bg-amber-50">
+                <input type="radio" name="service" value="Faux Locs" class="sr-only" onchange="updateBookingSummary()">
+                <h3 class="font-semibold text-sm">Faux Locs</h3>
+                <p class="text-xs text-stone-500">Butterfly / Bohemian · $250+</p>
+              </label>
+              <label class="service-option block rounded-xl border border-stone-200 p-4 cursor-pointer hover:border-amber-500 transition has-[:checked]:border-amber-700 has-[:checked]:bg-amber-50">
+                <input type="radio" name="service" value="Loc Retwist" class="sr-only" onchange="updateBookingSummary()">
+                <h3 class="font-semibold text-sm">Loc Retwist</h3>
+                <p class="text-xs text-stone-500">Maintenance & Styling · $80+</p>
+              </label>
+            </div>
+            <button onclick="bookingNext(2)" class="mt-6 rounded-lg bg-amber-700 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-amber-800">Continue →</button>
+          </div>
+
+          <!-- Step 2: Calendar & Time -->
+          <div id="bookingStep2" class="hidden bg-white rounded-2xl border border-stone-200 shadow-sm p-8">
+            <h2 class="text-xl font-semibold mb-2">2. Pick a Date & Time</h2>
+            <p class="text-sm text-stone-500 mb-6">Available slots shown for Tiffany</p>
+
+            <!-- Calendar -->
+            <div class="max-w-md mx-auto mb-8">
+              <div class="flex items-center justify-between mb-4">
+                <button onclick="prevMonth()" class="p-2 rounded-lg hover:bg-stone-100 transition">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                </button>
+                <h3 id="calendarMonth" class="font-semibold text-lg">January 2025</h3>
+                <button onclick="nextMonth()" class="p-2 rounded-lg hover:bg-stone-100 transition">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                </button>
+              </div>
+              <div class="calendar-grid" id="calendarGrid"></div>
+            </div>
+
+            <!-- Time slots -->
+            <div class="max-w-md mx-auto">
+              <h3 class="font-semibold text-sm mb-3">Available Times</h3>
+              <div id="timeSlots" class="text-center text-sm text-stone-500">Select a date to see available slots</div>
+            </div>
+
+            <div class="flex gap-3 mt-8">
+              <button onclick="bookingNext(1)" class="rounded-lg border border-stone-200 px-5 py-2.5 text-sm font-medium text-stone-600 transition hover:bg-stone-50">Back</button>
+              <button onclick="bookingNext(3)" class="rounded-lg bg-amber-700 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-amber-800">Continue →</button>
+            </div>
+          </div>
+
+          <!-- Step 3: Confirmation -->
+          <div id="bookingStep3" class="hidden bg-white rounded-2xl border border-stone-200 shadow-sm p-8">
+            <h2 class="text-xl font-semibold mb-6">3. Confirm & Book</h2>
+            <div class="bg-stone-50 rounded-xl p-6 mb-6 space-y-3" id="bookingSummary">
+              <p class="text-sm"><span class="font-medium">Service:</span> <span id="summaryService">—</span></p>
+              <p class="text-sm"><span class="font-medium">Date:</span> <span id="summaryDate">—</span></p>
+              <p class="text-sm"><span class="font-medium">Time:</span> <span id="summaryTime">—</span></p>
+            </div>
+            <div class="grid sm:grid-cols-2 gap-4 mb-6">
+              <div>
+                <label class="block text-sm font-medium text-stone-700 mb-1.5">Your Name</label>
+                <input type="text" id="bookingName" required class="w-full rounded-lg border border-stone-300 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-stone-700 mb-1.5">Phone</label>
+                <input type="tel" id="bookingPhone" required class="w-full rounded-lg border border-stone-300 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500">
+              </div>
+            </div>
+            <div class="mb-6">
+              <label class="block text-sm font-medium text-stone-700 mb-1.5">Email</label>
+              <input type="email" id="bookingEmail" required class="w-full rounded-lg border border-stone-300 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500">
+            </div>
+            <div class="mb-6">
+              <label class="block text-sm font-medium text-stone-700 mb-1.5">Notes (optional)</label>
+              <textarea id="bookingNotes" rows="2" class="w-full rounded-lg border border-stone-300 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500" placeholder="Length, thickness, special requests..."></textarea>
+            </div>
+            <div class="flex gap-3">
+              <button onclick="bookingNext(2)" class="rounded-lg border border-stone-200 px-5 py-2.5 text-sm font-medium text-stone-600 transition hover:bg-stone-50">Back</button>
+              <button onclick="confirmBooking()" class="rounded-lg bg-amber-700 px-6 py-2.5 text-sm font-medium text-white transition hover:bg-amber-800">Confirm Booking →</button>
+            </div>
+            <div id="bookingSuccess" class="hidden mt-6 p-6 bg-green-50 border border-green-200 rounded-xl text-center">
+              <p class="text-lg font-semibold text-green-800">🎉 Appointment Booked!</p>
+              <p class="text-sm text-green-700 mt-2">We'll send a confirmation to your email and phone shortly.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Footer -->
+      <footer class="bg-stone-900 text-stone-400 py-12">
+        <div class="max-w-6xl mx-auto px-6 text-center text-xs">
+          <p>&copy; 2025 Hair Style by Tiffany. All rights reserved.</p>
+        </div>
+      </footer>
+    </div>
+
+  </main>
+
+  <!-- ============================================================ -->
+  <!-- ADMIN PANEL LINK (floating, bottom-right)                     -->
+  <!-- ============================================================ -->
+  <a href="#" onclick="showPage('admin')" class="fixed bottom-6 right-6 z-40 w-12 h-12 rounded-full bg-stone-900 text-white flex items-center justify-center shadow-lg hover:bg-stone-800 transition" title="Admin Panel">
+    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+  </a>
+
+  <!-- ============================================================ -->
+  <!-- ADMIN PANEL PAGE                                              -->
+  <!-- ============================================================ -->
+  <div id="page-admin" class="page">
+    <!-- Admin login prompt -->
+    <div id="adminLogin" class="py-20 sm:py-28">
+      <div class="max-w-sm mx-auto px-6">
+        <div class="bg-white rounded-2xl border border-stone-200 shadow-sm p-8">
+          <div class="text-center mb-6">
+            <div class="w-16 h-16 rounded-full bg-amber-100 flex items-center justify-center mx-auto mb-4">
+              <svg class="w-8 h-8 text-amber-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            </div>
+            <h2 class="text-xl font-semibold">Admin Login</h2>
+            <p class="text-sm text-stone-500 mt-1">Enter your credentials</p>
+          </div>
+          <div class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-stone-700 mb-1.5">Username</label>
+              <input type="text" id="adminUser" class="w-full rounded-lg border border-stone-300 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-stone-700 mb-1.5">Password</label>
+              <input type="password" id="adminPass" class="w-full rounded-lg border border-stone-300 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500">
+            </div>
+            <button onclick="adminLogin()" class="w-full rounded-lg bg-amber-700 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-amber-800">Login →</button>
+            <p id="adminLoginError" class="hidden text-xs text-red-600 text-center">Invalid credentials. Try admin / admin123</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Admin Dashboard (hidden until login) -->
+    <div id="adminDashboard" class="hidden min-h-screen bg-stone-100">
+      <div class="flex">
+        <!-- Sidebar -->
+        <div class="admin-sidebar w-64 hidden md:block">
+          <div class="p-5 border-b border-stone-700">
+            <h2 class="text-white font-bold">HSBT Admin</h2>
+          </div>
+          <nav class="mt-4">
+            <a href="#" class="active" onclick="adminTab('overview')">📊 Overview</a>
+            <a href="#" onclick="adminTab('bookings')">📅 Bookings</a>
+            <a href="#" onclick="adminTab('services')">💇 Services</a>
+            <a href="#" onclick="adminTab('settings')">⚙️ Settings</a>
+            <a href="#" onclick="adminLogout()" class="mt-8 text-stone-500">🚪 Logout</a>
+          </nav>
+        </div>
+
+        <!-- Main content -->
+        <div class="flex-1 p-8">
+          <div class="flex justify-between items-center mb-8">
+            <h1 class="text-2xl font-bold" id="adminTitle">Dashboard Overview</h1>
+            <span class="text-sm text-stone-500">Last updated: just now</span>
+          </div>
+
+          <!-- Overview tab -->
+          <div id="adminOverview" class="admin-tab">
+            <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+              <div class="bg-white rounded-xl border border-stone-200 p-5">
+                <p class="text-sm text-stone-500">Today's Bookings</p>
+                <p class="text-3xl font-bold mt-1" id="todayCount">0</p>
+              </div>
+              <div class="bg-white rounded-xl border border-stone-200 p-5">
+                <p class="text-sm text-stone-500">This Week</p>
+                <p class="text-3xl font-bold mt-1" id="weekCount">0</p>
+              </div>
+              <div class="bg-white rounded-xl border border-stone-200 p-5">
+                <p class="text-sm text-stone-500">This Month</p>
+                <p class="text-3xl font-bold mt-1" id="monthCount">0</p>
+              </div>
+              <div class="bg-white rounded-xl border border-stone-200 p-5">
+                <p class="text-sm text-stone-500">Total Clients</p>
+                <p class="text-3xl font-bold mt-1" id="totalClients">0</p>
+              </div>
+            </div>
+            <div class="bg-white rounded-xl border border-stone-200 p-6">
+              <h3 class="font-semibold mb-4">Upcoming Appointments</h3>
+              <div id="upcomingAppts" class="text-sm text-stone-500">No upcoming appointments.</div>
+            </div>
+          </div>
+
+          <!-- Bookings tab -->
+          <div id="adminBookings" class="admin-tab hidden">
+            <div class="bg-white rounded-xl border border-stone-200 overflow-hidden">
+              <div class="p-4 border-b border-stone-100 flex justify-between items-center">
+                <h3 class="font-semibold">All Bookings</h3>
+                <input type="text" placeholder="Search..." class="rounded-lg border border-stone-300 px-3 py-1.5 text-sm">
+              </div>
+              <table class="w-full text-sm">
+                <thead class="bg-stone-50 text-stone-500 text-left">
+                  <tr><th class="p-3 font-medium">Client</th><th class="p-3 font-medium">Service</th><th class="p-3 font-medium">Date</th><th class="p-3 font-medium">Time</th><th class="p-3 font-medium">Status</th><th class="p-3 font-medium">Actions</th></tr>
+                </thead>
+                <tbody id="bookingsTableBody" class="divide-y divide-stone-100">
+                  <tr><td class="p-3 text-stone-500" colspan="6">No bookings yet.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Services tab -->
+          <div id="adminServices" class="admin-tab hidden">
+            <div class="bg-white rounded-xl border border-stone-200 p-6">
+              <div class="flex justify-between items-center mb-4">
+                <h3 class="font-semibold">Manage Services</h3>
+                <button onclick="addService()" class="text-sm bg-amber-700 text-white px-4 py-1.5 rounded-lg hover:bg-amber-800">+ Add Service</button>
+              </div>
+              <div id="servicesList" class="text-sm text-stone-500">Services are loaded from the front-end page.</div>
+            </div>
+          </div>
+
+          <!-- Settings tab -->
+          <div id="adminSettings" class="admin-tab hidden">
+            <div class="bg-white rounded-xl border border-stone-200 p-6">
+              <h3 class="font-semibold mb-4">Admin Settings</h3>
+              <div class="space-y-4 text-sm">
+                <div><label class="block font-medium text-stone-700 mb-1">Business Name</label><input type="text" value="Hair Style by Tiffany" class="w-full rounded-lg border border-stone-300 px-4 py-2"></div>
+                <div><label class="block font-medium text-stone-700 mb-1">Phone</label><input type="text" value="(785) 555-0123" class="w-full rounded-lg border border-stone-300 px-4 py-2"></div>
+                <div><label class="block font-medium text-stone-700 mb-1">Email</label><input type="text" value="hello@hairstylebytiffany.com" class="w-full rounded-lg border border-stone-300 px-4 py-2"></div>
+                <button onclick="alert('Settings saved!')" class="bg-amber-700 text-white px-5 py-2 rounded-lg hover:bg-amber-800">Save Settings</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- JAVASCRIPT                                                    -->
+  <!-- ============================================================ -->
+  <script>
+    const API_BASE = window.location.origin;
+
+    // ===================== PAGE NAVIGATION =====================
+    function showPage(page) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      const el = document.getElementById('page-' + page);
+      if (el) el.classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      document.getElementById('mobileMenu').classList.remove('open');
+    }
+
+    function toggleMobileMenu() {
+      document.getElementById('mobileMenu').classList.toggle('open');
+    }
+
+    // ===================== SCROLL REVEAL =====================
+    try {
+      document.querySelectorAll('section, footer').forEach(el => el.classList.add('reveal'));
+      const io = new IntersectionObserver(entries => {
+        entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in-view'); });
+      }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+      document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+    } catch (e) {}
+
+    // ===================== PORTFOLIO FILTER =====================
+    function filterPortfolio(cat) {
+      document.querySelectorAll('.filter-btn').forEach(b => {
+        b.classList.toggle('bg-amber-700', b.dataset.filter === cat);
+        b.classList.toggle('text-white', b.dataset.filter === cat);
+        b.classList.toggle('bg-white', b.dataset.filter !== cat);
+        b.classList.toggle('text-stone-600', b.dataset.filter !== cat);
+      });
+      document.querySelectorAll('.portfolio-item').forEach(item => {
+        if (cat === 'all' || item.dataset.category === cat) {
+          item.style.display = 'block';
+        } else {
+          item.style.display = 'none';
+        }
+      });
+    }
+
+    // ===================== SHOP CART =====================
+    let cart = [];
+    function addToCart(name, price) {
+      cart.push({ name, price });
+      renderCart();
+    }
+    function renderCart() {
+      const el = document.getElementById('cartItems');
+      const count = document.getElementById('cartCount');
+      const total = document.getElementById('cartTotal');
+      count.textContent = `(${cart.length} items)`;
+      if (cart.length === 0) {
+        el.textContent = 'Your cart is empty.';
+        total.textContent = '$0.00';
+        return;
+      }
+      el.innerHTML = cart.map((item, i) =>
+        `<div class="flex justify-between items-center py-1 border-b border-stone-100 last:border-0">
+          <span>${item.name}</span>
+          <span class="flex items-center gap-2"><span>$${item.price.toFixed(2)}</span><button onclick="removeFromCart(${i})" class="text-red-500 text-xs">✕</button></span>
+        </div>`
+      ).join('');
+      total.textContent = `$${cart.reduce((sum, item) => sum + item.price, 0).toFixed(2)}`;
+    }
+    function removeFromCart(i) { cart.splice(i, 1); renderCart(); }
+    function checkout() {
+      if (cart.length === 0) { alert('Your cart is empty!'); return; }
+      alert(`Order placed! Total: $${cart.reduce((s,i) => s+i.price, 0).toFixed(2)}\nWe'll contact you for pickup.`);
+      cart = []; renderCart();
+    }
+
+    // ===================== CONTACT FORM =====================
+    function submitContact(e) {
+      e.preventDefault();
+      document.getElementById('contactSuccess').classList.remove('hidden');
+      e.target.reset();
+    }
+
+    // ===================== BOOKING SYSTEM =====================
+    let currentMonth = new Date().getMonth();
+    let currentYear = new Date().getFullYear();
+    let selectedDate = null;
+    let selectedTime = null;
+    let bookings = [];
+    let stylists = [];
+    let services = [];
+    let adminToken = localStorage.getItem('hsbt_admin_token') || '';
+
+    async function loadServices() {
+      try { const r = await fetch(API_BASE + '/api/services'); services = await r.json(); } catch(e){}
+    }
+    async function loadStylists() {
+      try { const r = await fetch(API_BASE + '/api/stylists'); stylists = await r.json(); } catch(e){}
+    }
+    loadServices();
+    loadStylists();
+
+    function bookingNext(step) {
+      document.getElementById('bookingStep1').classList.add('hidden');
+      document.getElementById('bookingStep2').classList.add('hidden');
+      document.getElementById('bookingStep3').classList.add('hidden');
+      document.getElementById('bookingStep' + step).classList.remove('hidden');
+      document.querySelectorAll('.step-indicator').forEach((el, i) => {
+        el.classList.toggle('bg-amber-700', i < step);
+        el.classList.toggle('bg-stone-200', i >= step);
+      });
+      if (step === 2) renderCalendar();
+    }
+
+    function renderCalendar() {
+      const grid = document.getElementById('calendarGrid');
+      const monthEl = document.getElementById('calendarMonth');
+      const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+      monthEl.textContent = months[currentMonth] + ' ' + currentYear;
+
+      const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+      const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+      const today = new Date();
+      const todayStr = today.toDateString();
+
+      let html = '';
+      ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].forEach(d => {
+        html += `<div class="day-header">${d}</div>`;
+      });
+      for (let i = 0; i < firstDay; i++) {
+        html += `<div></div>`;
+      }
+      for (let d = 1; d <= daysInMonth; d++) {
+        const dateObj = new Date(currentYear, currentMonth, d);
+        const dateStr = dateObj.toDateString();
+        const isoStr = currentYear + '-' + String(currentMonth+1).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+        const isToday = dateStr === todayStr;
+        const isPast = dateObj < new Date(today.getFullYear(), today.getMonth(), today.getDate());
+        const isSelected = selectedDate === isoStr;
+        let cls = 'day-cell';
+        if (isToday) cls += ' today';
+        if (isSelected) cls += ' selected';
+        if (isPast) cls += ' other-month';
+        html += `<div class="${cls}" onclick="${isPast ? '' : `selectDate('${isoStr}')`}">${d}</div>`;
+      }
+      grid.innerHTML = html;
+    }
+
+    function prevMonth() {
+      currentMonth--;
+      if (currentMonth < 0) { currentMonth = 11; currentYear--; }
+      renderCalendar();
+    }
+    function nextMonth() {
+      currentMonth++;
+      if (currentMonth > 11) { currentMonth = 0; currentYear++; }
+      renderCalendar();
+    }
+
+    async function selectDate(dateStr) {
+      selectedDate = dateStr;
+      renderCalendar();
+      // Fetch availability from API
+      try {
+        const r = await fetch(API_BASE + '/api/availability?date=' + dateStr);
+        const availData = await r.json();
+        const ts = document.getElementById('timeSlots');
+        if (availData.length > 0) {
+          const allSlots = availData[0].slots || [];
+          ts.innerHTML = allSlots.map(s =>
+            `<span class="time-slot" onclick="selectTime('${s.display}')">${s.display}</span>`
+          ).join('');
+        } else {
+          // Fallback to local bookings
+          const localB = JSON.parse(localStorage.getItem('hsbt_bookings') || '[]').filter(b => b.date === dateStr).map(b => b.time);
+          const slots = ['9:00 AM','10:00 AM','11:00 AM','12:00 PM','1:00 PM','2:00 PM','3:00 PM','4:00 PM'];
+          ts.innerHTML = slots.map(t => {
+            const isBooked = localB.includes(t);
+            return `<span class="time-slot ${isBooked ? 'booked' : ''}" onclick="${isBooked ? '' : `selectTime('${t}')`}">${t}</span>`;
+          }).join('');
+        }
+      } catch(e) {
+        const localB = JSON.parse(localStorage.getItem('hsbt_bookings') || '[]').filter(b => b.date === dateStr).map(b => b.time);
+        const slots = ['9:00 AM','10:00 AM','11:00 AM','12:00 PM','1:00 PM','2:00 PM','3:00 PM','4:00 PM'];
+        const ts = document.getElementById('timeSlots');
+        ts.innerHTML = slots.map(t => {
+          const isBooked = localB.includes(t);
+          return `<span class="time-slot ${isBooked ? 'booked' : ''}" onclick="${isBooked ? '' : `selectTime('${t}')`}">${t}</span>`;
+        }).join('');
+      }
+      updateBookingSummary();
+    }
+
+    function selectTime(time) {
+      selectedTime = time;
+      document.querySelectorAll('.time-slot').forEach(el => el.classList.remove('selected'));
+      document.querySelectorAll('.time-slot').forEach(el => {
+        if (el.textContent.trim() === time) el.classList.add('selected');
+      });
+      updateBookingSummary();
+    }
+
+    function updateBookingSummary() {
+      const service = document.querySelector('input[name="service"]:checked');
+      document.getElementById('summaryService').textContent = service ? service.value : '—';
+      document.getElementById('summaryDate').textContent = selectedDate || '—';
+      document.getElementById('summaryTime').textContent = selectedTime || '—';
+    }
+
+    async function confirmBooking() {
+      const serviceEl = document.querySelector('input[name="service"]:checked');
+      const name = document.getElementById('bookingName').value.trim();
+      const phone = document.getElementById('bookingPhone').value.trim();
+      const email = document.getElementById('bookingEmail').value.trim();
+      const notes = document.getElementById('bookingNotes').value.trim();
+
+      if (!serviceEl) { alert('Please select a service'); bookingNext(1); return; }
+      if (!selectedDate) { alert('Please select a date'); bookingNext(2); return; }
+      if (!selectedTime) { alert('Please select a time'); bookingNext(2); return; }
+      if (!name || !phone || !email) { alert('Please fill in your name, phone and email'); return; }
+
+      const svc = services.find(s => s.name === serviceEl.value);
+      const stylist = stylists.length > 0 ? stylists[0] : { id: 1 };
+
+      try {
+        const res = await fetch(API_BASE + '/api/bookings', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            stylist_id: stylist.id,
+            service_id: svc ? svc.id : null,
+            client_name: name,
+            client_email: email,
+            client_phone: phone,
+            booking_date: selectedDate,
+            booking_time: selectedTime,
+            notes: notes
+          })
+        });
+        if (res.ok) {
+          document.getElementById('bookingSuccess').classList.remove('hidden');
+          document.querySelector('#bookingStep3 button[onclick="confirmBooking()"]').disabled = true;
+        } else {
+          const data = await res.json();
+          alert(data.error || 'Booking failed. Try again.');
+        }
+      } catch(e) {
+        const booking = { id: Date.now(), service: serviceEl.value, date: selectedDate, time: selectedTime, name, phone, email, notes, status: 'Confirmed' };
+        const lb = JSON.parse(localStorage.getItem('hsbt_bookings') || '[]');
+        lb.push(booking);
+        localStorage.setItem('hsbt_bookings', JSON.stringify(lb));
+        document.getElementById('bookingSuccess').classList.remove('hidden');
+        document.querySelector('#bookingStep3 button[onclick="confirmBooking()"]').disabled = true;
+      }
+    }
+
+    // ===================== ADMIN PANEL =====================
+    async function adminLogin() {
+      const user = document.getElementById('adminUser').value;
+      const pass = document.getElementById('adminPass').value;
+      try {
+        const r = await fetch(API_BASE + '/api/admin/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username: user, password: pass })
+        });
+        if (r.ok) {
+          const d = await r.json();
+          adminToken = d.token;
+          localStorage.setItem('hsbt_admin_token', adminToken);
+          document.getElementById('adminLogin').classList.add('hidden');
+          document.getElementById('adminDashboard').classList.remove('hidden');
+          document.getElementById('adminLoginError').classList.add('hidden');
+          updateAdmin();
+        } else {
+          document.getElementById('adminLoginError').classList.remove('hidden');
+        }
+      } catch(e) {
+        if (user === 'admin' && pass === 'admin123') {
+          document.getElementById('adminLogin').classList.add('hidden');
+          document.getElementById('adminDashboard').classList.remove('hidden');
+          document.getElementById('adminLoginError').classList.add('hidden');
+          updateAdmin();
+        } else {
+          document.getElementById('adminLoginError').classList.remove('hidden');
+        }
+      }
+    }
+
+    function adminLogout() {
+      adminToken = '';
+      localStorage.removeItem('hsbt_admin_token');
+      document.getElementById('adminDashboard').classList.add('hidden');
+      document.getElementById('adminLogin').classList.remove('hidden');
+      document.getElementById('adminUser').value = '';
+      document.getElementById('adminPass').value = '';
+    }
+
+    function adminTab(tab) {
+      document.querySelectorAll('.admin-tab').forEach(t => t.classList.add('hidden'));
+      document.getElementById('adminOverview').classList.toggle('hidden', tab !== 'overview');
+      document.getElementById('adminBookings').classList.toggle('hidden', tab !== 'bookings');
+      document.getElementById('adminServices').classList.toggle('hidden', tab !== 'services');
+      document.getElementById('adminSettings').classList.toggle('hidden', tab !== 'settings');
+      document.querySelectorAll('.admin-sidebar a').forEach(a => a.classList.remove('active'));
+      event.target.classList.add('active');
+      document.getElementById('adminTitle').textContent = tab.charAt(0).toUpperCase() + tab.slice(1);
+      if (tab === 'overview' || tab === 'bookings') updateAdmin();
+    }
+
+    async function updateAdmin() {
+      let stats = { today: 0, week: 0, month: 0, totalClients: 0 };
+      try {
+        const r = await fetch(API_BASE + '/api/stats', { headers: { 'Authorization': 'Bearer ' + adminToken } });
+        if (r.ok) stats = await r.json();
+      } catch(e) {}
+
+      document.getElementById('todayCount').textContent = stats.today;
+      document.getElementById('weekCount').textContent = stats.week;
+      document.getElementById('monthCount').textContent = stats.month;
+      document.getElementById('totalClients').textContent = stats.totalClients;
+
+      try {
+        const r1 = await fetch(API_BASE + '/api/bookings/upcoming', { headers: { 'Authorization': 'Bearer ' + adminToken } });
+        if (r1.ok) {
+          const upcoming = await r1.json();
+          const uEl = document.getElementById('upcomingAppts');
+          if (upcoming.length === 0) {
+            uEl.textContent = 'No upcoming appointments.';
+          } else {
+            uEl.innerHTML = upcoming.slice(0,10).map(b =>
+              `<div class="flex justify-between py-2 border-b border-stone-100 last:border-0">
+                <span><span class="font-medium">${b.client_name}</span> — ${b.service_name}</span>
+                <span class="text-stone-500">${b.booking_date} @ ${b.booking_time}</span>
+              </div>`
+            ).join('');
+          }
+        }
+      } catch(e) {}
+
+      try {
+        const r2 = await fetch(API_BASE + '/api/bookings', { headers: { 'Authorization': 'Bearer ' + adminToken } });
+        if (r2.ok) {
+          const allB = await r2.json();
+          const tBody = document.getElementById('bookingsTableBody');
+          if (allB.length === 0) {
+            tBody.innerHTML = '<tr><td class="p-3 text-stone-500" colspan="6">No bookings yet.</td></tr>';
+          } else {
+            tBody.innerHTML = allB.map(b =>
+              `<tr>
+                <td class="p-3">${b.client_name}</td>
+                <td class="p-3">${b.service_name}</td>
+                <td class="p-3">${b.booking_date}</td>
+                <td class="p-3">${b.booking_time}</td>
+                <td class="p-3"><span class="text-green-600 font-medium">${b.status}</span></td>
+                <td class="p-3">
+                  <button onclick="cancelBooking(${b.id})" class="text-red-500 text-xs hover:text-red-700">Cancel</button>
+                </td>
+              </tr>`
+            ).join('');
+          }
+        }
+      } catch(e) {}
+    }
+
+    async function cancelBooking(id) {
+      if (!confirm('Cancel this booking?')) return;
+      try {
+        await fetch(API_BASE + '/api/bookings/' + id + '/status', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + adminToken },
+          body: JSON.stringify({ status: 'cancelled' })
+        });
+      } catch(e) {}
+      updateAdmin();
+    }
+
+    function addService() {
+      const name = prompt('Service name:');
+      if (name) alert(`"${name}" added!`);
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      const today = new Date().toISOString().slice(0,10);
+      const qd = document.getElementById('quickDate');
+      if (qd) qd.value = today;
+    });
+  </script>
+
+</body>
+</html>
