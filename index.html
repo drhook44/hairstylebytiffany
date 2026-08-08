@@ -1056,10 +1056,10 @@
   <!-- ============================================================ -->
   <!-- JAVASCRIPT                                                    -->
   <!-- ============================================================ -->
-  <script>
+<script>
     const API_BASE = window.location.origin;
+    const TENANT_ID = 1;
 
-    // ===================== PAGE NAVIGATION =====================
     function showPage(page) {
       document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
       const el = document.getElementById('page-' + page);
@@ -1072,7 +1072,6 @@
       document.getElementById('mobileMenu').classList.toggle('open');
     }
 
-    // ===================== SCROLL REVEAL =====================
     try {
       document.querySelectorAll('section, footer').forEach(el => el.classList.add('reveal'));
       const io = new IntersectionObserver(entries => {
@@ -1081,7 +1080,6 @@
       document.querySelectorAll('.reveal').forEach(el => io.observe(el));
     } catch (e) {}
 
-    // ===================== PORTFOLIO FILTER =====================
     function filterPortfolio(cat) {
       document.querySelectorAll('.filter-btn').forEach(b => {
         b.classList.toggle('bg-amber-700', b.dataset.filter === cat);
@@ -1098,7 +1096,6 @@
       });
     }
 
-    // ===================== SHOP CART =====================
     let cart = [];
     function addToCart(name, price) {
       cart.push({ name, price });
@@ -1129,14 +1126,12 @@
       cart = []; renderCart();
     }
 
-    // ===================== CONTACT FORM =====================
     function submitContact(e) {
       e.preventDefault();
       document.getElementById('contactSuccess').classList.remove('hidden');
       e.target.reset();
     }
 
-    // ===================== BOOKING SYSTEM =====================
     let currentMonth = new Date().getMonth();
     let currentYear = new Date().getFullYear();
     let selectedDate = null;
@@ -1147,10 +1142,10 @@
     let adminToken = localStorage.getItem('hsbt_admin_token') || '';
 
     async function loadServices() {
-      try { const r = await fetch(API_BASE + '/api/services'); services = await r.json(); } catch(e){}
+      try { const r = await fetch(API_BASE + '/api/tenant/' + TENANT_ID + '/services'); services = await r.json(); } catch(e){}
     }
     async function loadStylists() {
-      try { const r = await fetch(API_BASE + '/api/stylists'); stylists = await r.json(); } catch(e){}
+      try { const r = await fetch(API_BASE + '/api/tenant/' + TENANT_ID + '/stylists'); stylists = await r.json(); } catch(e){}
     }
     loadServices();
     loadStylists();
@@ -1172,18 +1167,16 @@
       const monthEl = document.getElementById('calendarMonth');
       const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
       monthEl.textContent = months[currentMonth] + ' ' + currentYear;
-
       const firstDay = new Date(currentYear, currentMonth, 1).getDay();
       const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
       const today = new Date();
       const todayStr = today.toDateString();
-
       let html = '';
       ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].forEach(d => {
         html += `<div class="day-header">${d}</div>`;
       });
       for (let i = 0; i < firstDay; i++) {
-        html += `<div></div>`;
+        html += '<div></div>';
       }
       for (let d = 1; d <= daysInMonth; d++) {
         const dateObj = new Date(currentYear, currentMonth, d);
@@ -1215,9 +1208,8 @@
     async function selectDate(dateStr) {
       selectedDate = dateStr;
       renderCalendar();
-      // Fetch availability from API
       try {
-        const r = await fetch(API_BASE + '/api/availability?date=' + dateStr);
+        const r = await fetch(API_BASE + '/api/tenant/' + TENANT_ID + '/availability?date=' + dateStr);
         const availData = await r.json();
         const ts = document.getElementById('timeSlots');
         if (availData.length > 0) {
@@ -1226,22 +1218,12 @@
             `<span class="time-slot" onclick="selectTime('${s.display}')">${s.display}</span>`
           ).join('');
         } else {
-          // Fallback to local bookings
-          const localB = JSON.parse(localStorage.getItem('hsbt_bookings') || '[]').filter(b => b.date === dateStr).map(b => b.time);
           const slots = ['9:00 AM','10:00 AM','11:00 AM','12:00 PM','1:00 PM','2:00 PM','3:00 PM','4:00 PM'];
-          ts.innerHTML = slots.map(t => {
-            const isBooked = localB.includes(t);
-            return `<span class="time-slot ${isBooked ? 'booked' : ''}" onclick="${isBooked ? '' : `selectTime('${t}')`}">${t}</span>`;
-          }).join('');
+          ts.innerHTML = slots.map(t => `<span class="time-slot" onclick="selectTime('${t}')">${t}</span>`).join('');
         }
       } catch(e) {
-        const localB = JSON.parse(localStorage.getItem('hsbt_bookings') || '[]').filter(b => b.date === dateStr).map(b => b.time);
         const slots = ['9:00 AM','10:00 AM','11:00 AM','12:00 PM','1:00 PM','2:00 PM','3:00 PM','4:00 PM'];
-        const ts = document.getElementById('timeSlots');
-        ts.innerHTML = slots.map(t => {
-          const isBooked = localB.includes(t);
-          return `<span class="time-slot ${isBooked ? 'booked' : ''}" onclick="${isBooked ? '' : `selectTime('${t}')`}">${t}</span>`;
-        }).join('');
+        document.getElementById('timeSlots').innerHTML = slots.map(t => `<span class="time-slot" onclick="selectTime('${t}')">${t}</span>`).join('');
       }
       updateBookingSummary();
     }
@@ -1257,9 +1239,9 @@
 
     function updateBookingSummary() {
       const service = document.querySelector('input[name="service"]:checked');
-      document.getElementById('summaryService').textContent = service ? service.value : '—';
-      document.getElementById('summaryDate').textContent = selectedDate || '—';
-      document.getElementById('summaryTime').textContent = selectedTime || '—';
+      document.getElementById('summaryService').textContent = service ? service.value : '\u2014';
+      document.getElementById('summaryDate').textContent = selectedDate || '\u2014';
+      document.getElementById('summaryTime').textContent = selectedTime || '\u2014';
     }
 
     async function confirmBooking() {
@@ -1268,17 +1250,14 @@
       const phone = document.getElementById('bookingPhone').value.trim();
       const email = document.getElementById('bookingEmail').value.trim();
       const notes = document.getElementById('bookingNotes').value.trim();
-
       if (!serviceEl) { alert('Please select a service'); bookingNext(1); return; }
       if (!selectedDate) { alert('Please select a date'); bookingNext(2); return; }
       if (!selectedTime) { alert('Please select a time'); bookingNext(2); return; }
       if (!name || !phone || !email) { alert('Please fill in your name, phone and email'); return; }
-
       const svc = services.find(s => s.name === serviceEl.value);
       const stylist = stylists.length > 0 ? stylists[0] : { id: 1 };
-
       try {
-        const res = await fetch(API_BASE + '/api/bookings', {
+        const res = await fetch(API_BASE + '/api/tenant/' + TENANT_ID + '/bookings', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -1297,7 +1276,7 @@
           document.querySelector('#bookingStep3 button[onclick="confirmBooking()"]').disabled = true;
         } else {
           const data = await res.json();
-          alert(data.error || 'Booking failed. Try again.');
+          alert(data.error || 'Booking failed.');
         }
       } catch(e) {
         const booking = { id: Date.now(), service: serviceEl.value, date: selectedDate, time: selectedTime, name, phone, email, notes, status: 'Confirmed' };
@@ -1309,15 +1288,14 @@
       }
     }
 
-    // ===================== ADMIN PANEL =====================
     async function adminLogin() {
       const user = document.getElementById('adminUser').value;
       const pass = document.getElementById('adminPass').value;
       try {
-        const r = await fetch(API_BASE + '/api/admin/login', {
+        const r = await fetch(API_BASE + '/api/tenant/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username: user, password: pass })
+          body: JSON.stringify({ username: user, password: pass, tenant_id: TENANT_ID })
         });
         if (r.ok) {
           const d = await r.json();
@@ -1331,7 +1309,7 @@
           document.getElementById('adminLoginError').classList.remove('hidden');
         }
       } catch(e) {
-        if (user === 'admin' && pass === 'admin123') {
+        if (user === 'admin' && pass === 'salon123') {
           document.getElementById('adminLogin').classList.add('hidden');
           document.getElementById('adminDashboard').classList.remove('hidden');
           document.getElementById('adminLoginError').classList.add('hidden');
@@ -1353,50 +1331,45 @@
 
     function adminTab(tab) {
       document.querySelectorAll('.admin-tab').forEach(t => t.classList.add('hidden'));
-      document.getElementById('adminOverview').classList.toggle('hidden', tab !== 'overview');
-      document.getElementById('adminBookings').classList.toggle('hidden', tab !== 'bookings');
-      document.getElementById('adminServices').classList.toggle('hidden', tab !== 'services');
-      document.getElementById('adminSettings').classList.toggle('hidden', tab !== 'settings');
+      const tabs = ['overview', 'bookings', 'services', 'media', 'settings'];
+      tabs.forEach(t => {
+        const el = document.getElementById('admin' + t.charAt(0).toUpperCase() + t.slice(1));
+        if (el) el.classList.toggle('hidden', t !== tab);
+      });
       document.querySelectorAll('.admin-sidebar a').forEach(a => a.classList.remove('active'));
-      event.target.classList.add('active');
+      if (event && event.target) event.target.classList.add('active');
       document.getElementById('adminTitle').textContent = tab.charAt(0).toUpperCase() + tab.slice(1);
       if (tab === 'overview' || tab === 'bookings') updateAdmin();
+      if (tab === 'services') loadServicesTable();
+      if (tab === 'media') loadAdminGallery();
     }
 
     async function updateAdmin() {
       let stats = { today: 0, week: 0, month: 0, totalClients: 0 };
       try {
-        const r = await fetch(API_BASE + '/api/stats', { headers: { 'Authorization': 'Bearer ' + adminToken } });
+        const r = await fetch(API_BASE + '/api/tenant-admin/stats', { headers: { 'Authorization': 'Bearer ' + adminToken } });
         if (r.ok) stats = await r.json();
       } catch(e) {}
-
       document.getElementById('todayCount').textContent = stats.today;
       document.getElementById('weekCount').textContent = stats.week;
       document.getElementById('monthCount').textContent = stats.month;
       document.getElementById('totalClients').textContent = stats.totalClients;
-
       try {
-        const r1 = await fetch(API_BASE + '/api/bookings/upcoming', { headers: { 'Authorization': 'Bearer ' + adminToken } });
+        const r1 = await fetch(API_BASE + '/api/tenant-admin/bookings', { headers: { 'Authorization': 'Bearer ' + adminToken } });
         if (r1.ok) {
-          const upcoming = await r1.json();
+          const allB = await r1.json();
+          const upcoming = allB.filter(b => b.status === 'confirmed' && new Date(b.booking_date) >= new Date());
           const uEl = document.getElementById('upcomingAppts');
           if (upcoming.length === 0) {
             uEl.textContent = 'No upcoming appointments.';
           } else {
             uEl.innerHTML = upcoming.slice(0,10).map(b =>
               `<div class="flex justify-between py-2 border-b border-stone-100 last:border-0">
-                <span><span class="font-medium">${b.client_name}</span> — ${b.service_name}</span>
+                <span><span class="font-medium">${b.client_name}</span> \u2014 ${b.service_name}</span>
                 <span class="text-stone-500">${b.booking_date} @ ${b.booking_time}</span>
               </div>`
             ).join('');
           }
-        }
-      } catch(e) {}
-
-      try {
-        const r2 = await fetch(API_BASE + '/api/bookings', { headers: { 'Authorization': 'Bearer ' + adminToken } });
-        if (r2.ok) {
-          const allB = await r2.json();
           const tBody = document.getElementById('bookingsTableBody');
           if (allB.length === 0) {
             tBody.innerHTML = '<tr><td class="p-3 text-stone-500" colspan="6">No bookings yet.</td></tr>';
@@ -1421,7 +1394,7 @@
     async function cancelBooking(id) {
       if (!confirm('Cancel this booking?')) return;
       try {
-        await fetch(API_BASE + '/api/bookings/' + id + '/status', {
+        await fetch(API_BASE + '/api/tenant-admin/bookings/' + id + '/status', {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + adminToken },
           body: JSON.stringify({ status: 'cancelled' })
@@ -1430,15 +1403,9 @@
       updateAdmin();
     }
 
-    function addService() {
-      const name = prompt('Service name:');
-      if (name) alert(`"${name}" added!`);
-    }
-
-    // ===================== ADMIN SERVICES EDITOR =====================
     async function loadServicesTable() {
       try {
-        const r = await fetch(API_BASE + '/api/services');
+        const r = await fetch(API_BASE + '/api/tenant-admin/services', { headers: { 'Authorization': 'Bearer ' + adminToken } });
         const svcs = await r.json();
         const tbody = document.getElementById('servicesTableBody');
         if (svcs.length === 0) {
@@ -1447,7 +1414,7 @@
           tbody.innerHTML = svcs.map(s =>
             `<tr>
               <td class="p-3 font-medium">${s.name}</td>
-              <td class="p-3">${s.category || '—'}</td>
+              <td class="p-3">${s.category || '\u2014'}</td>
               <td class="p-3">$${s.price_min}</td>
               <td class="p-3">$${s.price_max}</td>
               <td class="p-3">${s.duration_min} min</td>
@@ -1477,7 +1444,7 @@
 
     async function editService(id) {
       try {
-        const r = await fetch(API_BASE + '/api/services');
+        const r = await fetch(API_BASE + '/api/tenant-admin/services', { headers: { 'Authorization': 'Bearer ' + adminToken } });
         const svcs = await r.json();
         const s = svcs.find(x => x.id === id);
         if (!s) return;
@@ -1509,7 +1476,7 @@
       };
       if (!data.name) { alert('Name is required'); return; }
       try {
-        const url = id ? API_BASE + '/api/services/' + id : API_BASE + '/api/services';
+        const url = id ? API_BASE + '/api/tenant-admin/services/' + id : API_BASE + '/api/tenant-admin/services';
         const method = id ? 'PUT' : 'POST';
         const r = await fetch(url, {
           method,
@@ -1519,19 +1486,18 @@
         if (r.ok) {
           closeEditService();
           loadServicesTable();
-          // Reload services for booking dropdown
-          const res = await fetch(API_BASE + '/api/services');
+          const res = await fetch(API_BASE + '/api/tenant/' + TENANT_ID + '/services');
           services = await res.json();
         } else {
           alert('Failed to save');
         }
-      } catch(e) { alert('Failed to save service'); }
+      } catch(e) { alert('Failed to save'); }
     }
 
     async function deleteService(id) {
       if (!confirm('Delete this service?')) return;
       try {
-        await fetch(API_BASE + '/api/services/' + id, {
+        await fetch(API_BASE + '/api/tenant-admin/services/' + id, {
           method: 'DELETE',
           headers: { 'Authorization': 'Bearer ' + adminToken }
         });
@@ -1539,7 +1505,6 @@
       } catch(e) { alert('Failed to delete'); }
     }
 
-    // ===================== MEDIA UPLOAD =====================
     document.addEventListener('DOMContentLoaded', function() {
       const fileInput = document.getElementById('mediaUpload');
       if (fileInput) {
@@ -1563,29 +1528,25 @@
       const category = document.getElementById('mediaCategory').value;
       const caption = document.getElementById('mediaCaption').value;
       const status = document.getElementById('uploadStatus');
-
       if (!fileInput.files || !fileInput.files[0]) {
         status.textContent = 'Please select an image first.';
         status.className = 'text-xs text-red-500 mt-1';
         return;
       }
-
       const formData = new FormData();
       formData.append('image', fileInput.files[0]);
       formData.append('category', category);
       formData.append('caption', caption);
-
       status.textContent = 'Uploading...';
       status.className = 'text-xs text-amber-600 mt-1';
-
       try {
-        const r = await fetch(API_BASE + '/api/upload/portfolio', {
+        const r = await fetch(API_BASE + '/api/tenant-admin/upload', {
           method: 'POST',
           headers: { 'Authorization': 'Bearer ' + adminToken },
           body: formData
         });
         if (r.ok) {
-          status.textContent = '✅ Image uploaded!';
+          status.textContent = '\u2705 Image uploaded!';
           status.className = 'text-xs text-green-600 mt-1';
           fileInput.value = '';
           document.getElementById('mediaCaption').value = '';
@@ -1593,18 +1554,18 @@
           loadAdminGallery();
         } else {
           const err = await r.json();
-          status.textContent = '❌ ' + (err.error || 'Upload failed');
+          status.textContent = '\u274c ' + (err.error || 'Upload failed');
           status.className = 'text-xs text-red-500 mt-1';
         }
       } catch(e) {
-        status.textContent = '❌ Upload failed. Is server running?';
+        status.textContent = '\u274c Upload failed.';
         status.className = 'text-xs text-red-500 mt-1';
       }
     }
 
     async function loadAdminGallery() {
       try {
-        const r = await fetch(API_BASE + '/api/portfolio');
+        const r = await fetch(API_BASE + '/api/tenant-admin/portfolio', { headers: { 'Authorization': 'Bearer ' + adminToken } });
         const images = await r.json();
         const gallery = document.getElementById('adminGallery');
         if (images.length === 0) {
@@ -1627,7 +1588,7 @@
     async function deleteMedia(id) {
       if (!confirm('Delete this image?')) return;
       try {
-        await fetch(API_BASE + '/api/portfolio/' + id, {
+        await fetch(API_BASE + '/api/tenant-admin/portfolio/' + id, {
           method: 'DELETE',
           headers: { 'Authorization': 'Bearer ' + adminToken }
         });
@@ -1635,29 +1596,9 @@
       } catch(e) {}
     }
 
-    // Update adminTab to also load services table and gallery
-    const originalAdminTab = adminTab;
-    adminTab = function(tab) {
-      document.querySelectorAll('.admin-tab').forEach(t => t.classList.add('hidden'));
-      const tabs = ['overview', 'bookings', 'services', 'media', 'settings'];
-      tabs.forEach(t => {
-        const el = document.getElementById('admin' + t.charAt(0).toUpperCase() + t.slice(1));
-        if (el) el.classList.toggle('hidden', t !== tab);
-      });
-      document.querySelectorAll('.admin-sidebar a').forEach(a => a.classList.remove('active'));
-      if (event && event.target) event.target.classList.add('active');
-      document.getElementById('adminTitle').textContent = tab.charAt(0).toUpperCase() + tab.slice(1);
-      if (tab === 'overview' || tab === 'bookings') updateAdmin();
-      if (tab === 'services') loadServicesTable();
-      if (tab === 'media') loadAdminGallery();
-    };
-
     document.addEventListener('DOMContentLoaded', function() {
       const today = new Date().toISOString().slice(0,10);
       const qd = document.getElementById('quickDate');
       if (qd) qd.value = today;
     });
   </script>
-
-</body>
-</html>
