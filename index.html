@@ -889,6 +889,7 @@
             <a href="#" class="active" onclick="adminTab('overview')">📊 Overview</a>
             <a href="#" onclick="adminTab('bookings')">📅 Bookings</a>
             <a href="#" onclick="adminTab('services')">💇 Services</a>
+            <a href="#" onclick="adminTab('media')">📸 Media</a>
             <a href="#" onclick="adminTab('settings')">⚙️ Settings</a>
             <a href="#" onclick="adminLogout()" class="mt-8 text-stone-500">🚪 Logout</a>
           </nav>
@@ -949,10 +950,89 @@
           <div id="adminServices" class="admin-tab hidden">
             <div class="bg-white rounded-xl border border-stone-200 p-6">
               <div class="flex justify-between items-center mb-4">
-                <h3 class="font-semibold">Manage Services</h3>
-                <button onclick="addService()" class="text-sm bg-amber-700 text-white px-4 py-1.5 rounded-lg hover:bg-amber-800">+ Add Service</button>
+                <h3 class="font-semibold">Manage Services & Pricing</h3>
+                <button onclick="addServiceModal()" class="text-sm bg-amber-700 text-white px-4 py-1.5 rounded-lg hover:bg-amber-800">+ Add Service</button>
               </div>
-              <div id="servicesList" class="text-sm text-stone-500">Services are loaded from the front-end page.</div>
+              <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                  <thead class="bg-stone-50 text-stone-500 text-left">
+                    <tr><th class="p-3 font-medium">Name</th><th class="p-3 font-medium">Category</th><th class="p-3 font-medium">Price Min</th><th class="p-3 font-medium">Price Max</th><th class="p-3 font-medium">Duration</th><th class="p-3 font-medium">Actions</th></tr>
+                  </thead>
+                  <tbody id="servicesTableBody" class="divide-y divide-stone-100 text-sm">
+                    <tr><td class="p-3 text-stone-500" colspan="6">Loading...</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Edit Service Modal -->
+            <div id="editServiceModal" class="hidden fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4" onclick="if(event.target===this)closeEditService()">
+              <div class="bg-white rounded-2xl shadow-xl max-w-lg w-full p-6" onclick="event.stopPropagation()">
+                <div class="flex justify-between items-center mb-4">
+                  <h3 class="font-semibold text-lg" id="editServiceTitle">Edit Service</h3>
+                  <button onclick="closeEditService()" class="text-stone-400 hover:text-stone-600">✕</button>
+                </div>
+                <input type="hidden" id="editServiceId">
+                <div class="space-y-3">
+                  <div><label class="block text-sm font-medium text-stone-700 mb-1">Name</label><input type="text" id="editServiceName" class="w-full rounded-lg border border-stone-300 px-4 py-2 text-sm"></div>
+                  <div><label class="block text-sm font-medium text-stone-700 mb-1">Category</label>
+                    <select id="editServiceCategory" class="w-full rounded-lg border border-stone-300 px-4 py-2 text-sm">
+                      <option>Braids</option><option>Cornrows</option><option>Twists</option><option>Locs</option><option>Natural Hair</option><option>Extensions</option>
+                    </select>
+                  </div>
+                  <div class="grid grid-cols-2 gap-3">
+                    <div><label class="block text-sm font-medium text-stone-700 mb-1">Starting Price ($)</label><input type="number" id="editServicePriceMin" class="w-full rounded-lg border border-stone-300 px-4 py-2 text-sm"></div>
+                    <div><label class="block text-sm font-medium text-stone-700 mb-1">Max Price ($)</label><input type="number" id="editServicePriceMax" class="w-full rounded-lg border border-stone-300 px-4 py-2 text-sm"></div>
+                  </div>
+                  <div><label class="block text-sm font-medium text-stone-700 mb-1">Duration (min)</label><input type="number" id="editServiceDuration" class="w-full rounded-lg border border-stone-300 px-4 py-2 text-sm"></div>
+                  <div><label class="block text-sm font-medium text-stone-700 mb-1">Description</label><textarea id="editServiceDesc" rows="2" class="w-full rounded-lg border border-stone-300 px-4 py-2 text-sm"></textarea></div>
+                </div>
+                <div class="flex gap-2 mt-6">
+                  <button onclick="saveService()" class="bg-amber-700 text-white px-5 py-2 rounded-lg text-sm hover:bg-amber-800">Save Changes</button>
+                  <button onclick="closeEditService()" class="border border-stone-200 px-5 py-2 rounded-lg text-sm hover:bg-stone-50">Cancel</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Media tab -->
+          <div id="adminMedia" class="admin-tab hidden">
+            <div class="grid lg:grid-cols-2 gap-6">
+              <div class="bg-white rounded-xl border border-stone-200 p-6">
+                <h3 class="font-semibold mb-4">Upload Portfolio Image</h3>
+                <div class="space-y-3">
+                  <div>
+                    <label class="block text-sm font-medium text-stone-700 mb-1">Choose Image</label>
+                    <input type="file" id="mediaUpload" accept="image/*" class="w-full text-sm file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-amber-50 file:text-amber-700 hover:file:bg-amber-100">
+                  </div>
+                  <div class="grid grid-cols-2 gap-3">
+                    <div>
+                      <label class="block text-sm font-medium text-stone-700 mb-1">Category</label>
+                      <select id="mediaCategory" class="w-full rounded-lg border border-stone-300 px-4 py-2 text-sm">
+                        <option value="braids">Braids</option>
+                        <option value="cornrows">Cornrows</option>
+                        <option value="twists">Twists</option>
+                        <option value="locs">Locs</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label class="block text-sm font-medium text-stone-700 mb-1">Caption</label>
+                      <input type="text" id="mediaCaption" placeholder="e.g. Medium box braids" class="w-full rounded-lg border border-stone-300 px-4 py-2 text-sm">
+                    </div>
+                  </div>
+                  <div id="uploadPreview" class="hidden mt-2">
+                    <img id="previewImg" class="rounded-lg max-h-40 object-cover">
+                  </div>
+                  <button onclick="uploadMedia()" class="bg-amber-700 text-white px-5 py-2 rounded-lg text-sm hover:bg-amber-800">Upload →</button>
+                  <p id="uploadStatus" class="text-xs text-stone-500 mt-1"></p>
+                </div>
+              </div>
+              <div class="bg-white rounded-xl border border-stone-200 p-6">
+                <h3 class="font-semibold mb-4">Portfolio Gallery</h3>
+                <div id="adminGallery" class="grid grid-cols-2 gap-3">
+                  <p class="text-sm text-stone-500 col-span-2">No images yet. Upload some!</p>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -1354,6 +1434,223 @@
       const name = prompt('Service name:');
       if (name) alert(`"${name}" added!`);
     }
+
+    // ===================== ADMIN SERVICES EDITOR =====================
+    async function loadServicesTable() {
+      try {
+        const r = await fetch(API_BASE + '/api/services');
+        const svcs = await r.json();
+        const tbody = document.getElementById('servicesTableBody');
+        if (svcs.length === 0) {
+          tbody.innerHTML = '<tr><td class="p-3 text-stone-500" colspan="6">No services yet.</td></tr>';
+        } else {
+          tbody.innerHTML = svcs.map(s =>
+            `<tr>
+              <td class="p-3 font-medium">${s.name}</td>
+              <td class="p-3">${s.category || '—'}</td>
+              <td class="p-3">$${s.price_min}</td>
+              <td class="p-3">$${s.price_max}</td>
+              <td class="p-3">${s.duration_min} min</td>
+              <td class="p-3 flex gap-1">
+                <button onclick="editService(${s.id})" class="text-amber-700 text-xs hover:text-amber-800">Edit</button>
+                <button onclick="deleteService(${s.id})" class="text-red-500 text-xs hover:text-red-700">Delete</button>
+              </td>
+            </tr>`
+          ).join('');
+        }
+      } catch(e) {
+        document.getElementById('servicesTableBody').innerHTML = '<tr><td class="p-3 text-red-500" colspan="6">Failed to load.</td></tr>';
+      }
+    }
+
+    function addServiceModal() {
+      document.getElementById('editServiceId').value = '';
+      document.getElementById('editServiceTitle').textContent = 'Add Service';
+      document.getElementById('editServiceName').value = '';
+      document.getElementById('editServiceCategory').value = 'Braids';
+      document.getElementById('editServicePriceMin').value = '';
+      document.getElementById('editServicePriceMax').value = '';
+      document.getElementById('editServiceDuration').value = 60;
+      document.getElementById('editServiceDesc').value = '';
+      document.getElementById('editServiceModal').classList.remove('hidden');
+    }
+
+    async function editService(id) {
+      try {
+        const r = await fetch(API_BASE + '/api/services');
+        const svcs = await r.json();
+        const s = svcs.find(x => x.id === id);
+        if (!s) return;
+        document.getElementById('editServiceId').value = s.id;
+        document.getElementById('editServiceTitle').textContent = 'Edit Service';
+        document.getElementById('editServiceName').value = s.name;
+        document.getElementById('editServiceCategory').value = s.category || 'Braids';
+        document.getElementById('editServicePriceMin').value = s.price_min;
+        document.getElementById('editServicePriceMax').value = s.price_max;
+        document.getElementById('editServiceDuration').value = s.duration_min;
+        document.getElementById('editServiceDesc').value = s.description || '';
+        document.getElementById('editServiceModal').classList.remove('hidden');
+      } catch(e) { alert('Failed to load service'); }
+    }
+
+    function closeEditService() {
+      document.getElementById('editServiceModal').classList.add('hidden');
+    }
+
+    async function saveService() {
+      const id = document.getElementById('editServiceId').value;
+      const data = {
+        name: document.getElementById('editServiceName').value,
+        category: document.getElementById('editServiceCategory').value,
+        price_min: parseFloat(document.getElementById('editServicePriceMin').value) || 0,
+        price_max: parseFloat(document.getElementById('editServicePriceMax').value) || 0,
+        duration_min: parseInt(document.getElementById('editServiceDuration').value) || 60,
+        description: document.getElementById('editServiceDesc').value
+      };
+      if (!data.name) { alert('Name is required'); return; }
+      try {
+        const url = id ? API_BASE + '/api/services/' + id : API_BASE + '/api/services';
+        const method = id ? 'PUT' : 'POST';
+        const r = await fetch(url, {
+          method,
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + adminToken },
+          body: JSON.stringify(data)
+        });
+        if (r.ok) {
+          closeEditService();
+          loadServicesTable();
+          // Reload services for booking dropdown
+          const res = await fetch(API_BASE + '/api/services');
+          services = await res.json();
+        } else {
+          alert('Failed to save');
+        }
+      } catch(e) { alert('Failed to save service'); }
+    }
+
+    async function deleteService(id) {
+      if (!confirm('Delete this service?')) return;
+      try {
+        await fetch(API_BASE + '/api/services/' + id, {
+          method: 'DELETE',
+          headers: { 'Authorization': 'Bearer ' + adminToken }
+        });
+        loadServicesTable();
+      } catch(e) { alert('Failed to delete'); }
+    }
+
+    // ===================== MEDIA UPLOAD =====================
+    document.addEventListener('DOMContentLoaded', function() {
+      const fileInput = document.getElementById('mediaUpload');
+      if (fileInput) {
+        fileInput.addEventListener('change', function() {
+          const preview = document.getElementById('uploadPreview');
+          const img = document.getElementById('previewImg');
+          if (this.files && this.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+              img.src = e.target.result;
+              preview.classList.remove('hidden');
+            };
+            reader.readAsDataURL(this.files[0]);
+          }
+        });
+      }
+    });
+
+    async function uploadMedia() {
+      const fileInput = document.getElementById('mediaUpload');
+      const category = document.getElementById('mediaCategory').value;
+      const caption = document.getElementById('mediaCaption').value;
+      const status = document.getElementById('uploadStatus');
+
+      if (!fileInput.files || !fileInput.files[0]) {
+        status.textContent = 'Please select an image first.';
+        status.className = 'text-xs text-red-500 mt-1';
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('image', fileInput.files[0]);
+      formData.append('category', category);
+      formData.append('caption', caption);
+
+      status.textContent = 'Uploading...';
+      status.className = 'text-xs text-amber-600 mt-1';
+
+      try {
+        const r = await fetch(API_BASE + '/api/upload/portfolio', {
+          method: 'POST',
+          headers: { 'Authorization': 'Bearer ' + adminToken },
+          body: formData
+        });
+        if (r.ok) {
+          status.textContent = '✅ Image uploaded!';
+          status.className = 'text-xs text-green-600 mt-1';
+          fileInput.value = '';
+          document.getElementById('mediaCaption').value = '';
+          document.getElementById('uploadPreview').classList.add('hidden');
+          loadAdminGallery();
+        } else {
+          const err = await r.json();
+          status.textContent = '❌ ' + (err.error || 'Upload failed');
+          status.className = 'text-xs text-red-500 mt-1';
+        }
+      } catch(e) {
+        status.textContent = '❌ Upload failed. Is server running?';
+        status.className = 'text-xs text-red-500 mt-1';
+      }
+    }
+
+    async function loadAdminGallery() {
+      try {
+        const r = await fetch(API_BASE + '/api/portfolio');
+        const images = await r.json();
+        const gallery = document.getElementById('adminGallery');
+        if (images.length === 0) {
+          gallery.innerHTML = '<p class="text-sm text-stone-500 col-span-2">No images yet. Upload some!</p>';
+        } else {
+          gallery.innerHTML = images.map(img =>
+            `<div class="relative group rounded-lg overflow-hidden border border-stone-200">
+              <img src="${API_BASE}${img.url}" class="w-full aspect-square object-cover">
+              <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center gap-2">
+                <span class="text-xs text-white bg-black/60 px-2 py-1 rounded">${img.category}</span>
+                <button onclick="deleteMedia(${img.id})" class="text-xs text-red-300 hover:text-red-100 bg-black/60 px-2 py-1 rounded">Delete</button>
+              </div>
+              ${img.caption ? `<p class="text-xs text-stone-500 p-1.5">${img.caption}</p>` : ''}
+            </div>`
+          ).join('');
+        }
+      } catch(e) {}
+    }
+
+    async function deleteMedia(id) {
+      if (!confirm('Delete this image?')) return;
+      try {
+        await fetch(API_BASE + '/api/portfolio/' + id, {
+          method: 'DELETE',
+          headers: { 'Authorization': 'Bearer ' + adminToken }
+        });
+        loadAdminGallery();
+      } catch(e) {}
+    }
+
+    // Update adminTab to also load services table and gallery
+    const originalAdminTab = adminTab;
+    adminTab = function(tab) {
+      document.querySelectorAll('.admin-tab').forEach(t => t.classList.add('hidden'));
+      const tabs = ['overview', 'bookings', 'services', 'media', 'settings'];
+      tabs.forEach(t => {
+        const el = document.getElementById('admin' + t.charAt(0).toUpperCase() + t.slice(1));
+        if (el) el.classList.toggle('hidden', t !== tab);
+      });
+      document.querySelectorAll('.admin-sidebar a').forEach(a => a.classList.remove('active'));
+      if (event && event.target) event.target.classList.add('active');
+      document.getElementById('adminTitle').textContent = tab.charAt(0).toUpperCase() + tab.slice(1);
+      if (tab === 'overview' || tab === 'bookings') updateAdmin();
+      if (tab === 'services') loadServicesTable();
+      if (tab === 'media') loadAdminGallery();
+    };
 
     document.addEventListener('DOMContentLoaded', function() {
       const today = new Date().toISOString().slice(0,10);
