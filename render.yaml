@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: hairstylebytiffany
+    runtime: node
+    repo: https://github.com/YOUR_USERNAME/hairstylebytiffany
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: RENDER
+        value: "true"
+      - key: NODE_VERSION
+        value: "20"
