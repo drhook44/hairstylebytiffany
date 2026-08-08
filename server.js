@@ -3,20 +3,35 @@ const path = require('path');
 const cors = require('cors');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const multer = require('multer');
 const db = require('./database');
 
 const app = express();
 const PORT = process.env.PORT || 3033;
+const fs = require('fs');
+
+// Upload directory for images
+const UPLOAD_DIR = process.env.RENDER ? '/tmp/uploads' : path.join(__dirname, 'uploads');
+if (!fs.existsSync(UPLOAD_DIR)) fs.mkdirSync(UPLOAD_DIR, { recursive: true });
+
+// Multer storage config
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, UPLOAD_DIR),
+  filename: (req, file, cb) => cb(null, Date.now() + '-' + file.originalname.replace(/\s+/g, '-'))
+});
+const upload = multer({ 
+  storage,
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
+  fileFilter: (req, file, cb) => {
+    const allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+    if (allowed.includes(file.mimetype)) cb(null, true);
+    else cb(new Error('Only images allowed (jpg, png, webp, gif)'));
+  }
+});
 
 // Render deployment — ensure data directory persists
-const fs = require('fs');
 const dataDir = path.join(__dirname, 'data');
 if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
-
-// On Render, use /tmp for the DB so it's writable
-const DB_PATH = process.env.RENDER 
-  ? path.join('/tmp', 'salon.db') 
-  : path.join(__dirname, 'data', 'salon.db');
 const JWT_SECRET = 'hsbt-salon-secret-key-2025';
 
 app.use(cors());
@@ -87,6 +102,36 @@ app.put('/api/services/:id', authMiddleware, (req, res) => {
 
 app.delete('/api/services/:id', authMiddleware, (req, res) => {
   db.prepare('UPDATE services SET active = 0 WHERE id = ?').run(req.params.id);
+  res.json({ success: true });
+});
+
+// ===================== IMAGE UPLOAD =====================
+app.post('/api/upload', authMiddleware, upload.single('image'), (req, res) => {
+  if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
+  const url = '/uploads/' + req.file.filename;
+  res.json({ url, filename: req.file.filename });
+});
+
+app.post('/api/upload/portfolio', authMiddleware, upload.single('image'), (req, res) => {
+  if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
+  const { category, caption } = req.body;
+  const url = '/uploads/' + req.file.filename;
+  const result = db.prepare('INSERT INTO portfolio_images (url, category, caption) VALUES (?, ?, ?)').run(url, category || 'braids', caption || '');
+  res.json({ id: result.lastInsertRowid, url, category, caption });
+});
+
+app.get('/api/portfolio', (req, res) => {
+  const images = db.prepare('SELECT * FROM portfolio_images ORDER BY created_at DESC').all();
+  res.json(images);
+});
+
+app.delete('/api/portfolio/:id', authMiddleware, (req, res) => {
+  const img = db.prepare('SELECT * FROM portfolio_images WHERE id = ?').get(req.params.id);
+  if (img) {
+    const filePath = path.join(UPLOAD_DIR, path.basename(img.url));
+    if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+    db.prepare('DELETE FROM portfolio_images WHERE id = ?').run(req.params.id);
+  }
   res.json({ success: true });
 });
 
@@ -229,6 +274,7 @@ app.put('/api/settings', authMiddleware, (req, res) => {
 
 // ===================== STATIC FILES =====================
 app.use(express.static(__dirname));
+app.use('/uploads', express.static(UPLOAD_DIR));
 
 // Serve index.html for all non-API routes (SPA fallback)
 app.use((req, res, next) => {
