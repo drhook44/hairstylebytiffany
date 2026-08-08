@@ -143,6 +143,63 @@ app.put('/api/superadmin/tenants/:id/plan', superAdminAuth, (req, res) => {
   res.json({ success: true });
 });
 
+// ===== STRIPE BILLING =====
+const stripeKey = process.env.STRIPE_SECRET_KEY || '';
+let stripe = null;
+try { if (stripeKey) stripe = require('stripe')(stripeKey); } catch(e) {}
+
+app.get('/api/billing/plans', (req, res) => {
+  res.json([
+    { id: 'free', name: 'Free', price: 0, tenants: 1, features: ['1 salon', 'Basic booking', 'Up to 5 services'] },
+    { id: 'starter', name: 'Starter', price: 19, tenants: 3, features: ['3 salons', 'Booking + payments', 'Image uploads', 'Email support'] },
+    { id: 'pro', name: 'Professional', price: 49, tenants: 10, features: ['10 salons', 'Everything in Starter', 'Custom domains', 'Priority support'] },
+    { id: 'unlimited', name: 'Unlimited', price: 99, tenants: 999, features: ['Unlimited salons', 'Everything in Pro', 'White-label', 'API access', 'Dedicated support'] }
+  ]);
+});
+
+app.post('/api/billing/create-checkout', async (req, res) => {
+  if (!stripe) return res.status(503).json({ error: 'Stripe not configured. Set STRIPE_SECRET_KEY env var.' });
+  const { plan_id, tenant_id, success_url, cancel_url } = req.body;
+  const prices = { starter: 1900, pro: 4900, unlimited: 9900 };
+  const price = prices[plan_id];
+  if (!price) return res.status(400).json({ error: 'Invalid plan' });
+  try {
+    const session = await stripe.checkout.sessions.create({
+      mode: 'subscription',
+      payment_method_types: ['card'],
+      line_items: [{ price_data: { currency: 'usd', product_data: { name: plan_id + ' Plan' }, recurring: { interval: 'month' }, unit_amount: price }, quantity: 1 }],
+      metadata: { tenant_id: String(tenant_id), plan_id },
+      success_url: success_url || 'https://hairstylebytiffany.onrender.com/?payment=success',
+      cancel_url: cancel_url || 'https://hairstylebytiffany.onrender.com/?payment=cancelled'
+    });
+    res.json({ url: session.url, session_id: session.id });
+  } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+app.post('/api/billing/webhook', express.raw({type: 'application/json'}), (req, res) => {
+  if (!stripe) return res.status(503).json({ error: 'Stripe not configured' });
+  const sig = req.headers['stripe-signature'];
+  let event;
+  try {
+    event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET || '');
+  } catch(e) { return res.status(400).json({ error: 'Invalid signature' }); }
+  if (event.type === 'checkout.session.completed') {
+    const session = event.data.object;
+    const tenant_id = session.metadata.tenant_id;
+    const plan_id = session.metadata.plan_id;
+    if (tenant_id) {
+      db.prepare('UPDATE tenant_plans SET plan=?, status=?, stripe_subscription_id=? WHERE tenant_id=?')
+        .run(plan_id, 'active', session.subscription || '', Number(tenant_id));
+    }
+  }
+  res.json({ received: true });
+});
+
+app.get('/api/tenant/:tenantId/billing', (req, res) => {
+  const plan = db.prepare('SELECT plan, status, stripe_subscription_id FROM tenant_plans WHERE tenant_id = ?').get(req.params.tenantId);
+  res.json(plan || { plan: 'free', status: 'active' });
+});
+
 // ===== PUBLIC TENANT API =====
 app.get('/api/tenant-by-subdomain/:subdomain', (req, res) => {
   const tenant = db.prepare('SELECT id, subdomain, business_name, address, hours, logo_url, hero_color FROM tenants WHERE subdomain = ? AND is_active = 1').get(req.params.subdomain);

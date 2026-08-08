@@ -17,6 +17,7 @@
     "express": "^4.21.0",
     "jsonwebtoken": "^9.0.3",
     "multer": "^2.2.0",
+    "stripe": "^22.4.0",
     "uuid": "^14.0.1"
   }
 }
