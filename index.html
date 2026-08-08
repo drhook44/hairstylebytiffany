@@ -862,6 +862,10 @@
             <p class="text-sm text-stone-500 mt-1">Enter your credentials</p>
           </div>
           <div class="space-y-4">
+            <div class="flex border border-stone-200 rounded-lg overflow-hidden mb-2">
+              <button id="modeTenant" class="flex-1 py-2 text-sm font-medium bg-amber-700 text-white" onclick="setAdminMode('tenant')">Salon Login</button>
+              <button id="modeSuper" class="flex-1 py-2 text-sm font-medium bg-white text-stone-600" onclick="setAdminMode('super')">Super Admin</button>
+            </div>
             <div>
               <label class="block text-sm font-medium text-stone-700 mb-1.5">Username</label>
               <input type="text" id="adminUser" class="w-full rounded-lg border border-stone-300 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500">
@@ -871,7 +875,7 @@
               <input type="password" id="adminPass" class="w-full rounded-lg border border-stone-300 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500">
             </div>
             <button onclick="adminLogin()" class="w-full rounded-lg bg-amber-700 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-amber-800">Login →</button>
-            <p id="adminLoginError" class="hidden text-xs text-red-600 text-center">Invalid credentials. Try admin / admin123</p>
+            <p id="adminLoginError" class="hidden text-xs text-red-600 text-center">Invalid credentials.</p>
           </div>
         </div>
       </div>
@@ -1051,6 +1055,91 @@
         </div>
       </div>
     </div>
+
+    <!-- Super Admin Dashboard (hidden until super login) -->
+    <div id="saDashboard" class="hidden min-h-screen bg-stone-100">
+      <div class="flex">
+        <div class="w-64 hidden md:block bg-zinc-900 text-white min-h-screen">
+          <div class="p-5 border-b border-zinc-700">
+            <h2 class="font-bold">☰ Super Admin</h2>
+          </div>
+          <nav class="mt-4 space-y-1 px-2">
+            <a href="#" class="active flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium bg-zinc-700" onclick="saTab('tenants')">🏢 Tenants</a>
+            <a href="#" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-zinc-300 hover:bg-zinc-800" onclick="saTab('sastats')">📊 Platform Stats</a>
+            <a href="#" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-zinc-300 hover:bg-zinc-800" onclick="saTab('salogs')">📜 Activity Log</a>
+            <hr class="border-zinc-700 my-2">
+            <a href="#" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-red-400 hover:bg-zinc-800" onclick="saLogout()">🚪 Logout</a>
+          </nav>
+        </div>
+        <div class="flex-1 p-6 md:p-10">
+          <div class="flex items-center justify-between mb-8">
+            <h1 id="saTitle" class="text-2xl font-semibold text-zinc-900">Tenants</h1>
+          </div>
+
+          <!-- Tenants Tab -->
+          <div id="saTenants" class="sa-tab">
+            <div class="flex justify-between items-center mb-6">
+              <p class="text-sm text-stone-500">Manage all salons on the platform</p>
+              <button onclick="saAddTenantModal()" class="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700">+ Add Tenant</button>
+            </div>
+            <div class="bg-white rounded-xl border border-stone-200 shadow-sm overflow-hidden">
+              <table class="w-full text-sm">
+                <thead class="bg-stone-50 text-left">
+                  <tr>
+                    <th class="p-3 font-medium text-stone-600">ID</th>
+                    <th class="p-3 font-medium text-stone-600">Name</th>
+                    <th class="p-3 font-medium text-stone-600">Subdomain</th>
+                    <th class="p-3 font-medium text-stone-600">Plan</th>
+                    <th class="p-3 font-medium text-stone-600">Status</th>
+                    <th class="p-3 font-medium text-stone-600">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="saTenantsBody">
+                  <tr><td class="p-3 text-stone-500" colspan="6">Loading...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Add Tenant Modal -->
+          <div id="saAddTenantModal" class="fixed inset-0 z-50 hidden bg-black/40 flex items-center justify-center p-4">
+            <div class="bg-white rounded-2xl p-6 max-w-md w-full shadow-xl">
+              <h3 class="text-lg font-semibold mb-4">Add New Tenant</h3>
+              <div class="space-y-3">
+                <div><label class="block text-sm font-medium text-stone-700 mb-1">Business Name</label><input id="saNewName" class="w-full rounded-lg border border-stone-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"></div>
+                <div><label class="block text-sm font-medium text-stone-700 mb-1">Owner Name</label><input id="saNewOwner" class="w-full rounded-lg border border-stone-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500" placeholder="e.g. Jane"></div>
+                <div><label class="block text-sm font-medium text-stone-700 mb-1">Owner Email</label><input id="saNewEmail" class="w-full rounded-lg border border-stone-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500" placeholder="owner@email.com"></div>
+                <div><label class="block text-sm font-medium text-stone-700 mb-1">Subdomain</label><input id="saNewSubdomain" class="w-full rounded-lg border border-stone-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500" placeholder="e.g. tiffany"></div>
+                <div><label class="block text-sm font-medium text-stone-700 mb-1">Password</label><input id="saNewPass" class="w-full rounded-lg border border-stone-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500" value="salon123"></div>
+              </div>
+              <div class="flex gap-2 mt-6">
+                <button onclick="saCreateTenant()" class="flex-1 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700">Create →</button>
+                <button onclick="document.getElementById('saAddTenantModal').classList.add('hidden')" class="rounded-lg border border-stone-200 px-4 py-2 text-sm text-stone-600 hover:bg-stone-50">Cancel</button>
+              </div>
+              <p id="saAddStatus" class="text-xs mt-2"></p>
+            </div>
+          </div>
+
+          <!-- Stats Tab -->
+          <div id="saSastats" class="sa-tab hidden">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+              <div class="bg-white rounded-xl border border-stone-200 p-6"><p class="text-sm text-stone-500">Total Tenants</p><p id="saTotalTenants" class="text-3xl font-bold mt-1">—</p></div>
+              <div class="bg-white rounded-xl border border-stone-200 p-6"><p class="text-sm text-stone-500">Total Bookings</p><p id="saTotalBookings" class="text-3xl font-bold mt-1">—</p></div>
+              <div class="bg-white rounded-xl border border-stone-200 p-6"><p class="text-sm text-stone-500">Active Plan</p><p id="saPlan" class="text-3xl font-bold mt-1">—</p></div>
+              <div class="bg-white rounded-xl border border-stone-200 p-6"><p class="text-sm text-stone-500">Platform Status</p><p id="saStatus" class="text-3xl font-bold mt-1 text-green-600">Online</p></div>
+            </div>
+          </div>
+
+          <!-- Logs Tab -->
+          <div id="saSalogs" class="sa-tab hidden">
+            <div class="bg-white rounded-xl border border-stone-200 p-6">
+              <p class="text-sm text-stone-500">Recent platform activity</p>
+              <div id="saLogsList" class="mt-4 text-sm text-stone-600">Log feature coming soon.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- ============================================================ -->
@@ -1105,24 +1194,24 @@
       const el = document.getElementById('cartItems');
       const count = document.getElementById('cartCount');
       const total = document.getElementById('cartTotal');
-      count.textContent = `(${cart.length} items)`;
+      count.textContent = '(' + cart.length + ' items)';
       if (cart.length === 0) {
         el.textContent = 'Your cart is empty.';
         total.textContent = '$0.00';
         return;
       }
       el.innerHTML = cart.map((item, i) =>
-        `<div class="flex justify-between items-center py-1 border-b border-stone-100 last:border-0">
-          <span>${item.name}</span>
-          <span class="flex items-center gap-2"><span>$${item.price.toFixed(2)}</span><button onclick="removeFromCart(${i})" class="text-red-500 text-xs">✕</button></span>
-        </div>`
+        '<div class="flex justify-between items-center py-1 border-b border-stone-100 last:border-0">' +
+          '<span>' + item.name + '</span>' +
+          '<span class="flex items-center gap-2"><span>$' + item.price.toFixed(2) + '</span><button onclick="removeFromCart(' + i + ')" class="text-red-500 text-xs">\u2715</button></span>' +
+        '</div>'
       ).join('');
-      total.textContent = `$${cart.reduce((sum, item) => sum + item.price, 0).toFixed(2)}`;
+      total.textContent = '$' + cart.reduce((sum, item) => sum + item.price, 0).toFixed(2);
     }
     function removeFromCart(i) { cart.splice(i, 1); renderCart(); }
     function checkout() {
       if (cart.length === 0) { alert('Your cart is empty!'); return; }
-      alert(`Order placed! Total: $${cart.reduce((s,i) => s+i.price, 0).toFixed(2)}\nWe'll contact you for pickup.`);
+      alert('Order placed! Total: $' + cart.reduce((s,i) => s+i.price, 0).toFixed(2) + '\\nWe will contact you for pickup.');
       cart = []; renderCart();
     }
 
@@ -1171,27 +1260,22 @@
       const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
       const today = new Date();
       const todayStr = today.toDateString();
-      let html = '';
-      ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].forEach(d => {
-        html += `<div class="day-header">${d}</div>`;
-      });
-      for (let i = 0; i < firstDay; i++) {
-        html += '<div></div>';
-      }
+      let h = '';
+      ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].forEach(d => { h += '<div class="day-header">' + d + '</div>'; });
+      for (let i = 0; i < firstDay; i++) { h += '<div></div>'; }
       for (let d = 1; d <= daysInMonth; d++) {
         const dateObj = new Date(currentYear, currentMonth, d);
-        const dateStr = dateObj.toDateString();
         const isoStr = currentYear + '-' + String(currentMonth+1).padStart(2,'0') + '-' + String(d).padStart(2,'0');
-        const isToday = dateStr === todayStr;
+        const isToday = dateObj.toDateString() === todayStr;
         const isPast = dateObj < new Date(today.getFullYear(), today.getMonth(), today.getDate());
         const isSelected = selectedDate === isoStr;
         let cls = 'day-cell';
         if (isToday) cls += ' today';
         if (isSelected) cls += ' selected';
         if (isPast) cls += ' other-month';
-        html += `<div class="${cls}" onclick="${isPast ? '' : `selectDate('${isoStr}')`}">${d}</div>`;
+        h += '<div class="' + cls + '" onclick="' + (isPast ? '' : "selectDate('" + isoStr + "')") + '">' + d + '</div>';
       }
-      grid.innerHTML = html;
+      grid.innerHTML = h;
     }
 
     function prevMonth() {
@@ -1214,16 +1298,14 @@
         const ts = document.getElementById('timeSlots');
         if (availData.length > 0) {
           const allSlots = availData[0].slots || [];
-          ts.innerHTML = allSlots.map(s =>
-            `<span class="time-slot" onclick="selectTime('${s.display}')">${s.display}</span>`
-          ).join('');
+          ts.innerHTML = allSlots.map(s => '<span class="time-slot" onclick="selectTime(' + "'" + s.display + "'" + ')">' + s.display + '</span>').join('');
         } else {
           const slots = ['9:00 AM','10:00 AM','11:00 AM','12:00 PM','1:00 PM','2:00 PM','3:00 PM','4:00 PM'];
-          ts.innerHTML = slots.map(t => `<span class="time-slot" onclick="selectTime('${t}')">${t}</span>`).join('');
+          ts.innerHTML = slots.map(t => '<span class="time-slot" onclick="selectTime(' + "'" + t + "'" + ')">' + t + '</span>').join('');
         }
       } catch(e) {
         const slots = ['9:00 AM','10:00 AM','11:00 AM','12:00 PM','1:00 PM','2:00 PM','3:00 PM','4:00 PM'];
-        document.getElementById('timeSlots').innerHTML = slots.map(t => `<span class="time-slot" onclick="selectTime('${t}')">${t}</span>`).join('');
+        document.getElementById('timeSlots').innerHTML = slots.map(t => '<span class="time-slot" onclick="selectTime(' + "'" + t + "'" + ')">' + t + '</span>').join('');
       }
       updateBookingSummary();
     }
@@ -1288,9 +1370,44 @@
       }
     }
 
+    // ===================== ADMIN AUTH =====================
+    let adminMode = 'tenant';
+    function setAdminMode(mode) {
+      adminMode = mode;
+      document.getElementById('modeTenant').className = mode === 'tenant' ? 'flex-1 py-2 text-sm font-medium bg-amber-700 text-white' : 'flex-1 py-2 text-sm font-medium bg-white text-stone-600';
+      document.getElementById('modeSuper').className = mode === 'super' ? 'flex-1 py-2 text-sm font-medium bg-amber-700 text-white' : 'flex-1 py-2 text-sm font-medium bg-white text-stone-600';
+    }
+
     async function adminLogin() {
       const user = document.getElementById('adminUser').value;
       const pass = document.getElementById('adminPass').value;
+      document.getElementById('adminLoginError').classList.add('hidden');
+
+      if (adminMode === 'super') {
+        try {
+          const r = await fetch(API_BASE + '/api/superadmin/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username: user, password: pass })
+          });
+          if (r.ok) {
+            const d = await r.json();
+            adminToken = d.token;
+            localStorage.setItem('hsbt_admin_token', adminToken);
+            document.getElementById('adminLogin').classList.add('hidden');
+            document.getElementById('saDashboard').classList.remove('hidden');
+            saLoadTenants();
+          } else {
+            document.getElementById('adminLoginError').textContent = 'Invalid super admin credentials.';
+            document.getElementById('adminLoginError').classList.remove('hidden');
+          }
+        } catch(e) {
+          document.getElementById('adminLoginError').textContent = 'Connection error.';
+          document.getElementById('adminLoginError').classList.remove('hidden');
+        }
+        return;
+      }
+
       try {
         const r = await fetch(API_BASE + '/api/tenant/login', {
           method: 'POST',
@@ -1303,18 +1420,18 @@
           localStorage.setItem('hsbt_admin_token', adminToken);
           document.getElementById('adminLogin').classList.add('hidden');
           document.getElementById('adminDashboard').classList.remove('hidden');
-          document.getElementById('adminLoginError').classList.add('hidden');
           updateAdmin();
         } else {
+          document.getElementById('adminLoginError').textContent = 'Invalid salon credentials.';
           document.getElementById('adminLoginError').classList.remove('hidden');
         }
       } catch(e) {
         if (user === 'admin' && pass === 'salon123') {
           document.getElementById('adminLogin').classList.add('hidden');
           document.getElementById('adminDashboard').classList.remove('hidden');
-          document.getElementById('adminLoginError').classList.add('hidden');
           updateAdmin();
         } else {
+          document.getElementById('adminLoginError').textContent = 'Invalid salon credentials.';
           document.getElementById('adminLoginError').classList.remove('hidden');
         }
       }
@@ -1364,10 +1481,10 @@
             uEl.textContent = 'No upcoming appointments.';
           } else {
             uEl.innerHTML = upcoming.slice(0,10).map(b =>
-              `<div class="flex justify-between py-2 border-b border-stone-100 last:border-0">
-                <span><span class="font-medium">${b.client_name}</span> \u2014 ${b.service_name}</span>
-                <span class="text-stone-500">${b.booking_date} @ ${b.booking_time}</span>
-              </div>`
+              '<div class="flex justify-between py-2 border-b border-stone-100 last:border-0">' +
+                '<span><span class="font-medium">' + b.client_name + '</span> \u2014 ' + b.service_name + '</span>' +
+                '<span class="text-stone-500">' + b.booking_date + ' @ ' + b.booking_time + '</span>' +
+              '</div>'
             ).join('');
           }
           const tBody = document.getElementById('bookingsTableBody');
@@ -1375,16 +1492,14 @@
             tBody.innerHTML = '<tr><td class="p-3 text-stone-500" colspan="6">No bookings yet.</td></tr>';
           } else {
             tBody.innerHTML = allB.map(b =>
-              `<tr>
-                <td class="p-3">${b.client_name}</td>
-                <td class="p-3">${b.service_name}</td>
-                <td class="p-3">${b.booking_date}</td>
-                <td class="p-3">${b.booking_time}</td>
-                <td class="p-3"><span class="text-green-600 font-medium">${b.status}</span></td>
-                <td class="p-3">
-                  <button onclick="cancelBooking(${b.id})" class="text-red-500 text-xs hover:text-red-700">Cancel</button>
-                </td>
-              </tr>`
+              '<tr>' +
+                '<td class="p-3">' + b.client_name + '</td>' +
+                '<td class="p-3">' + b.service_name + '</td>' +
+                '<td class="p-3">' + b.booking_date + '</td>' +
+                '<td class="p-3">' + b.booking_time + '</td>' +
+                '<td class="p-3"><span class="text-green-600 font-medium">' + b.status + '</span></td>' +
+                '<td class="p-3"><button onclick="cancelBooking(' + b.id + ')" class="text-red-500 text-xs hover:text-red-700">Cancel</button></td>' +
+              '</tr>'
             ).join('');
           }
         }
@@ -1412,17 +1527,17 @@
           tbody.innerHTML = '<tr><td class="p-3 text-stone-500" colspan="6">No services yet.</td></tr>';
         } else {
           tbody.innerHTML = svcs.map(s =>
-            `<tr>
-              <td class="p-3 font-medium">${s.name}</td>
-              <td class="p-3">${s.category || '\u2014'}</td>
-              <td class="p-3">$${s.price_min}</td>
-              <td class="p-3">$${s.price_max}</td>
-              <td class="p-3">${s.duration_min} min</td>
-              <td class="p-3 flex gap-1">
-                <button onclick="editService(${s.id})" class="text-amber-700 text-xs hover:text-amber-800">Edit</button>
-                <button onclick="deleteService(${s.id})" class="text-red-500 text-xs hover:text-red-700">Delete</button>
-              </td>
-            </tr>`
+            '<tr>' +
+              '<td class="p-3 font-medium">' + s.name + '</td>' +
+              '<td class="p-3">' + (s.category || '\u2014') + '</td>' +
+              '<td class="p-3">$' + s.price_min + '</td>' +
+              '<td class="p-3">$' + s.price_max + '</td>' +
+              '<td class="p-3">' + s.duration_min + ' min</td>' +
+              '<td class="p-3 flex gap-1">' +
+                '<button onclick="editService(' + s.id + ')" class="text-amber-700 text-xs hover:text-amber-800">Edit</button>' +
+                '<button onclick="deleteService(' + s.id + ')" class="text-red-500 text-xs hover:text-red-700">Delete</button>' +
+              '</td>' +
+            '</tr>'
           ).join('');
         }
       } catch(e) {
@@ -1572,14 +1687,14 @@
           gallery.innerHTML = '<p class="text-sm text-stone-500 col-span-2">No images yet. Upload some!</p>';
         } else {
           gallery.innerHTML = images.map(img =>
-            `<div class="relative group rounded-lg overflow-hidden border border-stone-200">
-              <img src="${API_BASE}${img.url}" class="w-full aspect-square object-cover">
-              <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center gap-2">
-                <span class="text-xs text-white bg-black/60 px-2 py-1 rounded">${img.category}</span>
-                <button onclick="deleteMedia(${img.id})" class="text-xs text-red-300 hover:text-red-100 bg-black/60 px-2 py-1 rounded">Delete</button>
-              </div>
-              ${img.caption ? `<p class="text-xs text-stone-500 p-1.5">${img.caption}</p>` : ''}
-            </div>`
+            '<div class="relative group rounded-lg overflow-hidden border border-stone-200">' +
+              '<img src="' + API_BASE + img.url + '" class="w-full aspect-square object-cover">' +
+              '<div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center gap-2">' +
+                '<span class="text-xs text-white bg-black/60 px-2 py-1 rounded">' + img.category + '</span>' +
+                '<button onclick="deleteMedia(' + img.id + ')" class="text-xs text-red-300 hover:text-red-100 bg-black/60 px-2 py-1 rounded">Delete</button>' +
+              '</div>' +
+              (img.caption ? '<p class="text-xs text-stone-500 p-1.5">' + img.caption + '</p>' : '') +
+            '</div>'
           ).join('');
         }
       } catch(e) {}
@@ -1594,6 +1709,111 @@
         });
         loadAdminGallery();
       } catch(e) {}
+    }
+
+    // ===================== SUPER ADMIN =====================
+    function saTab(tab) {
+      document.querySelectorAll('.sa-tab').forEach(t => t.classList.add('hidden'));
+      document.getElementById('sa' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.remove('hidden');
+      document.querySelectorAll('#saDashboard nav a').forEach(a => a.classList.remove('active', 'bg-zinc-700'));
+      document.querySelectorAll('#saDashboard nav a').forEach(a => {
+        a.classList.add('text-zinc-300', 'hover:bg-zinc-800');
+        if (a.textContent.trim().includes(tab === 'tenants' ? 'Tenants' : tab === 'sastats' ? 'Stats' : 'Log')) {
+          a.classList.remove('text-zinc-300', 'hover:bg-zinc-800');
+          a.classList.add('bg-zinc-700');
+        }
+      });
+      const titles = { tenants: 'Tenants', sastats: 'Platform Stats', salogs: 'Activity Log' };
+      document.getElementById('saTitle').textContent = titles[tab] || 'Tenants';
+    }
+
+    async function saLoadTenants() {
+      try {
+        const r = await fetch(API_BASE + '/api/superadmin/tenants', {
+          headers: { 'Authorization': 'Bearer ' + adminToken }
+        });
+        if (r.ok) {
+          const tenants = await r.json();
+          const body = document.getElementById('saTenantsBody');
+          if (tenants.length === 0) {
+            body.innerHTML = '<tr><td class="p-3 text-stone-500" colspan="6">No tenants yet.</td></tr>';
+          } else {
+            body.innerHTML = tenants.map(t =>
+              '<tr>' +
+                '<td class="p-3">' + t.id + '</td>' +
+                '<td class="p-3 font-medium">' + t.business_name + '</td>' +
+                '<td class="p-3">' + t.subdomain + '</td>' +
+                '<td class="p-3">' + (t.plan || 'Free') + '</td>' +
+                '<td class="p-3"><span class="text-green-600 font-medium">' + (t.active ? 'Active' : 'Inactive') + '</span></td>' +
+                '<td class="p-3">' +
+                  '<button onclick="saDeleteTenant(' + t.id + ')" class="text-red-500 text-xs hover:text-red-700">Delete</button>' +
+                '</td>' +
+              '</tr>'
+            ).join('');
+          }
+          document.getElementById('saTotalTenants').textContent = tenants.length;
+        }
+      } catch(e) {
+        document.getElementById('saTenantsBody').innerHTML = '<tr><td class="p-3 text-red-500" colspan="6">Failed to load tenants.</td></tr>';
+      }
+    }
+
+    function saAddTenantModal() {
+      document.getElementById('saAddTenantModal').classList.remove('hidden');
+      document.getElementById('saAddStatus').textContent = '';
+    }
+
+    async function saCreateTenant() {
+      const name = document.getElementById('saNewName').value.trim();
+      const owner = document.getElementById('saNewOwner').value.trim();
+      const email = document.getElementById('saNewEmail').value.trim();
+      const subdomain = document.getElementById('saNewSubdomain').value.trim();
+      const password = document.getElementById('saNewPass').value.trim();
+      const status = document.getElementById('saAddStatus');
+      if (!name || !subdomain || !email || !password) {
+        status.textContent = 'Business name, subdomain, email, and password required.';
+        status.className = 'text-xs text-red-500';
+        return;
+      }
+      try {
+        const r = await fetch(API_BASE + '/api/superadmin/tenants', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + adminToken },
+          body: JSON.stringify({ business_name: name, owner_name: owner, owner_email: email, subdomain: subdomain, password: password })
+        });
+        if (r.ok) {
+          status.textContent = 'Tenant created! Refreshing...';
+          status.className = 'text-xs text-green-600';
+          document.getElementById('saAddTenantModal').classList.add('hidden');
+          saLoadTenants();
+        } else {
+          const err = await r.json();
+          status.textContent = err.error || 'Failed to create tenant.';
+          status.className = 'text-xs text-red-500';
+        }
+      } catch(e) {
+        status.textContent = 'Connection error.';
+        status.className = 'text-xs text-red-500';
+      }
+    }
+
+    async function saDeleteTenant(id) {
+      if (!confirm('Delete tenant #' + id + ' and all its data?')) return;
+      try {
+        const r = await fetch(API_BASE + '/api/superadmin/tenants/' + id, {
+          method: 'DELETE',
+          headers: { 'Authorization': 'Bearer ' + adminToken }
+        });
+        if (r.ok) saLoadTenants();
+        else alert('Failed to delete');
+      } catch(e) { alert('Failed to delete'); }
+    }
+
+    function saLogout() {
+      adminToken = '';
+      localStorage.removeItem('hsbt_admin_token');
+      document.getElementById('saDashboard').classList.add('hidden');
+      document.getElementById('adminLogin').classList.remove('hidden');
     }
 
     document.addEventListener('DOMContentLoaded', function() {
